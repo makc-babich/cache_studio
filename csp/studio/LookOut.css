@@ -1,0 +1,81 @@
+﻿#lookout a.menuItem {
+    border: 0px solid #eeeeee;
+    color: #000000;
+    display: block;
+    /*font-weight: bold;*/
+    margin: 0;
+    /* padding: 1px 0; */
+	padding: 0px 0px;
+    text-decoration: none;
+    vertical-align: middle;
+    white-space: nowrap;
+
+}
+
+#lookout a.menuItem:hover {
+    color: #000000;
+    /*background: #4682B4;*/
+    /* background-image: url(images/grad-gray-10x30.png); */
+	background: url('images/top_label.png') repeat-x;
+	padding: 0px 0px;
+    border: medium none;
+    margin: 0;
+}
+#lookout {
+	border: 1px solid rgb(180,180,180);
+	/*overflow: auto; */
+	/*overflow:hidden;*/
+	padding: 0px 0px;
+	overflow-y:auto;
+	overflow-x:hidden;
+	background: #BCD9EF;
+}
+.lookoutTab {
+ background: rgb(242,242,242);
+	border-bottom: 1px solid rgb(180,180,180);
+
+}
+.lookoutButton {
+	/* color: white; */
+	color: #000000;
+    background-image: url(images/top_label.png);
+	background-repeat: repeat-x;
+	font-size:14px;
+	font-weight: normal;
+	font-family: verdana;
+	/* font-size: 1.0em; */
+	text-align: left;
+	border: 1px solid rgb(183, 183, 183);
+}
+
+
+.button1 {
+    background-image: url(images/grayDragHeader.png);
+   /* background-repeat: repeat-x;	*/
+    /*background: none repeat scroll 0 0 #346C8D;*/
+    border: 1px solid rgb(52,108,141);
+    color:#000000;
+    padding: 1px 4px;
+    width: 298;
+    font-size: 1.5em;
+}
+.button1:hover {
+	background-image: url(images/grad-gray-10x30.png);
+	background-repeat: repeat-x;
+}
+/* @class="%ZEN.Component.menuSeparator" */
+/* @doc="Style for menu separator (hr)." */
+#lookout .menuSeparator {
+    color: white;
+    height: 1px;
+    padding: 0;
+}
+#lookout div.zendiv {
+	margin:1px;
+	
+}  
+#lookout .zendiv {
+	margin:1px;
+	
+}
+/* EOF */
