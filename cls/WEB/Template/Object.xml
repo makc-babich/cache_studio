@@ -1,0 +1,1299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.Template.Object">
+<Description>
+	Базовый класс для всех web-страниц</Description>
+<Abstract>1</Abstract>
+<Super>%ZEN.Component.page</Super>
+<TimeCreated>63094,61601.84656</TimeCreated>
+
+<Parameter name="APPLICATION">
+<Description>
+Имя приложения, которому принадлежит эта страница.</Description>
+<Default>WEB.Application</Default>
+</Parameter>
+
+<Parameter name="PAGENAME">
+<Description>
+Отображаемое имя для нового приложения.</Description>
+</Parameter>
+
+<Parameter name="DOMAIN">
+<Description>
+Домен, используемый для локализации.</Description>
+<Default>STUDIO</Default>
+</Parameter>
+
+<Parameter name="LANG">
+<Default>ua</Default>
+</Parameter>
+
+<Parameter name="MODELCLASS">
+<Description>
+Name of MVC DataModel class that supplies data for the form.</Description>
+<Type>STRING</Type>
+</Parameter>
+
+<Parameter name="AUTOLOGOUT">
+<Description>
+If true, then attempt to refresh this page when its session timeout period has expired.
+This will cause a login page to display if the current session has ended
+and security is set to require login.</Description>
+<Type>BOOLEAN</Type>
+<Default>1</Default>
+</Parameter>
+
+<Parameter name="EXPIRES">
+<Default>0</Default>
+</Parameter>
+
+<Property name="deleteMsg">
+<Description>
+Localized string that will be available to the client.</Description>
+<Type>%ZEN.Datatype.caption</Type>
+<InitialExpression>$$$Text("Вилучити даний запис?","ide")</InitialExpression>
+</Property>
+
+<Property name="objectID">
+<Type>%String</Type>
+<Parameter name="ZENURL" value="ID"/>
+</Property>
+
+<Property name="modelClass">
+<Type>%String</Type>
+<InitialExpression>..#MODELCLASS</InitialExpression>
+</Property>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Parameter CSSINCLUDES = "ide.css";
+
+]]></Content>
+</UDLText>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля страницы.</Description>
+<Data><![CDATA[
+<style type="text/css">
+#menuInsert {
+	padding-left: 10px;
+}
+.background-SelectTerr { 
+	height:16px;
+	width:16px;
+	background: url(images/Select.png) no-repeat;
+   }
+div#mainProgressBox {
+	position: absolute;
+	width: 500px;
+	border: #cccccc 1px solid;
+	color: black;
+	font-weight: normal;
+	font-size: 8pt;
+	background-color: #F5F5F5;
+	visibility: hidden;
+	text-align: center;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	
+}
+div#msgProgressbox {
+	position: absolute;
+	width: 500px;
+	border: #cccccc 1px solid;
+	color: white;
+	font-weight: normal;
+	font-size: 8pt;
+	background-color:grey;
+	text-align: center;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	visibility: hidden;
+	z-index:300;
+	
+}
+</style>
+]]></Data>
+</XData>
+
+<Method name="SetSessionData">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>name:%String,data:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+  d %session.Set(name,data)
+  q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetSessionData">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>name:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[  q $Get(%session.Data(name),"")
+]]></Implementation>
+</Method>
+
+<Method name="GetCSPSessionCookie">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[  q %session.CSPSessionCookie
+]]></Implementation>
+</Method>
+
+<Method name="setSizeBodyTlb">
+<Description>
+установка размера таблицы
+tlb - id  таблицы</Description>
+<FormalSpec>tlb</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+var
+        UA=window.navigator.userAgent,       // содержит переданный браузером юзерагент
+        //--------------------------------------------------------------------------------
+        OperaB = /Opera[ \/]+\w+\.\w+/i,     //
+        OperaV = /Version[ \/]+\w+\.\w+/i,   //
+        FirefoxB = /Firefox\/\w+\.\w+/i,     // шаблоны для распарсивания юзерагента
+        ChromeB = /Chrome\/\w+\.\w+/i,       //
+        SafariB = /Version\/\w+\.\w+/i,      //
+        IEB = /MSIE *\d+\.\w+/i,             //
+        SafariV = /Safari\/\w+\.\w+/i,
+        //--------------------------------------------------------------------------------
+        OperaV = UA.match(OperaV),
+        Firefox = UA.match(FirefoxB),
+        Chrome = UA.match(ChromeB),
+        Safari = UA.match(SafariB),
+        SafariV = UA.match(SafariV),
+        IE = UA.match(IEB),
+        Opera = UA.match(OperaB);
+        
+         if (OperaV!=null) {this.classSetSessionData('usNavigator','OperaV')}
+         if (Firefox!=null) {this.classSetSessionData('usNavigator','Firefox')}
+         if (Chrome!=null) {this.classSetSessionData('usNavigator','Chrome')}
+         if (Safari!=null) {this.classSetSessionData('usNavigator','Safari')}
+         if (SafariV!=null) {this.classSetSessionData('usNavigator','SafariV')}
+         if (IE!=null) {this.classSetSessionData('usNavigator','IE')}
+         if (Opera!=null) {this.classSetSessionData('usNavigator','Opera')}
+    
+    //this.modalMessage(Opera);
+    var table = zen(tlb);
+    if ((Firefox !=null)||(Opera !=null)||(OperaV !=null))
+    {
+        table.setProperty('fixedHeaders',1);
+    }
+    else
+    {
+        table.setProperty('fixedHeaders',0);
+    }
+    
+    var elem = document.getElementById(tlb);
+
+    var w = elem.offsetWidth;
+        var h = elem.offsetHeight;
+    
+        var l = 0;
+        var t = 0;
+    
+        while (elem)
+        {
+            l += elem.offsetLeft;
+            t += elem.offsetTop;
+            elem = elem.offsetParent;
+        }
+    ;
+    
+    // find height of window
+    var winHeight = zenGetWindowHeight();
+    //var winHeight=screen.height
+    var szH = parseInt((winHeight -  t)-60);
+    //var szH = parseInt(winHeight -  t);
+    
+    var winWidth = zenGetWindowWidth();
+    var szW =parseInt((winWidth -  l)-10);
+    //var szW =parseInt(winWidth-500);
+    var StyleTlb='padding-left: 4px; overflow:auto;';
+    table.setProperty('containerStyle',StyleTlb);
+    //table.setProperty('bodyHeight',szH);
+   table.setProperty('height',szH);
+   table.setProperty('width',szW);
+]]></Implementation>
+</Method>
+
+<Method name="setSizeBodyTlbT">
+<Description>
+установка размера таблицы
+tlb - id  таблицы</Description>
+<FormalSpec>tlb</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+    var table = zen(tlb);
+    var winHeight = zenGetWindowHeight();
+    var szH =parseInt(winHeight-170);
+   var sH=szH.toString()+"px";
+    table.setProperty('bodyHeight',sH);
+]]></Implementation>
+</Method>
+
+<Method name="setHeight">
+<Description>
+установка высоты контрола
+comp-id контрола</Description>
+<FormalSpec>comp</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+    var comp = zen(comp);
+    var winHeight = zenGetWindowHeight();
+    var szH =parseInt(winHeight-130);
+   var sH=szH.toString()+"px";
+   var sT="padding-bottom:30px;height:"+sH;
+    comp.setProperty('enclosingStyle',sT);
+]]></Implementation>
+</Method>
+
+<Method name="isMsg">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>msg</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	
+	if (msg != "")
+		{
+	        this.modalMessage(msg);
+		
+		}
+	    return true;
+]]></Implementation>
+</Method>
+
+<Method name="isEmpty">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>comp,msgEmpty</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var g = comp.getValue();
+	var s = g.toString();
+	if((s==null)||(s.length==0)||(s==""))
+	{
+		if (msgEmpty != "")
+		{
+	         this.modalMessage(msgEmpty);
+		}
+	  //  comp.setValue('');
+	  //  comp.setValue('',''); 
+	    comp.setProperty('controlStyle','background-color: FF9999;');
+	    comp.focus();	
+	    return false;
+	    
+	   
+	}
+	else if ((s != null) || (s.length != 0) || (s != ""))
+	{
+		var newS = s.replace(/\s+/,"");
+		if (newS == "")
+	    {    
+	       if (msgEmpty != "")
+		{
+	         this.modalMessage(msgEmpty);
+		}
+	  //  comp.setValue('');
+	    comp.setProperty('controlStyle','background-color: FF9999;');
+	    comp.focus();	
+	    return false;
+	   }
+	    else
+	   {
+	     comp.setProperty('controlStyle','background: white;');   
+	     return true;
+	   }   
+		 
+	}
+	else
+	{
+	    comp.setProperty('controlStyle','background: white;');
+	    return true;
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isChar">
+<FormalSpec>comp,msgEmpty,msgChar</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (this.isEmpty(comp, msgEmpty))
+	{		
+	  var s = comp.getValue();
+	  var pattern = /[A-Za-zА-Яа-я]/;
+	  
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgChar);
+	  //   comp.setValue('');
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isLenth4000">
+<FormalSpec>comp,msgEmpty,msgChar</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (this.isEmpty(comp, msgEmpty))
+	{
+		
+  var s = comp.getValue();	
+  var pattern =/^[\s\S]{0,4000}$/;
+  
+  if((s!=null)||(s.length!=0)||(s!=""))
+	{
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');		
+		return true;		
+	  }
+	  else
+	  {
+		  this.modalMessage(msgChar);		  
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     return false;
+	     
+	  }
+     }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isLenth250">
+<FormalSpec>comp,msgChar</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+
+  var s = comp.getValue();	
+  var pattern =/^[\s\S]{0,250}$/;
+  
+  if((s!=null)||(s.length!=0)||(s!=""))
+{
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');		
+		return true;		
+	  }
+	  else
+	  {
+		  this.modalMessage(msgChar);		  
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     return false;
+	     
+	  }
+
+}
+]]></Implementation>
+</Method>
+
+<Method name="isDateNotRequiredFilled">
+<FormalSpec>comp,msgDate</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	  var s = comp.findElement('control').value;	  
+	  var dat = s.substr(6,10);
+	  
+  if((s.length != 0) || ( s != ""))
+  {
+	  	  var pattern = /^(0[1-9]|1[0-9]|2[0-9]|3[01]).(0[1-9]|1[012]).[0-9]{4}$/;
+	  if (pattern.test(s) && parseInt(dat) > 1841)
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgDate);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+  }
+  else
+  {
+	  return true;
+  }
+]]></Implementation>
+</Method>
+
+<Method name="isLengthNotRequiredFilled">
+<FormalSpec>comp,lengthVal,msgChar</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+		
+  var s = comp.getValue();
+  var lengthValInt = parseInt(lengthVal);
+  var lengthValIntMax = parseInt(lengthVal) - 1;
+  
+  	
+  var pattern =/^[\s\S]{0,lengthValInt}$/;
+  
+  if((s!=null)||(s.length!=0)||(s!=""))
+	{
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');		
+		return true;		
+	  }
+	  else
+	  {
+		  var newValue = s.substring(0,lengthValIntMax);
+		  this.modalMessage(msgChar);		  
+		  comp.setValue(newValue);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     return false; 
+       }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isLenth4000NotRequiredFilled1">
+<FormalSpec>comp,msgChar</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+  var s = comp.getValue();	
+ var pattern =/^[\s\S]{0,4000}$/;
+  
+  if((s!=null)||(s.length!=0)||(s!=""))
+	{
+	  if (s.length < 250)
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgChar);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+     }
+]]></Implementation>
+</Method>
+
+<Method name="isLenth4000NotRequiredFilled">
+<FormalSpec>comp,msgEmpty,msgChar</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+  var s = comp.getValue();	
+  var pattern =/.{,250}/; /// заменить на 4000 для 
+  
+  if((s!=null)||(s.length!=0)||(s!=""))
+	{
+	  if (s.length < 250)
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgChar);
+	     //comp.setValue('');
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+     }
+]]></Implementation>
+</Method>
+
+<Method name="isCharLat">
+<Description>
+только латинские символы</Description>
+<FormalSpec>comp,msgEmpty,msgChar</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (this.isEmpty(comp, msgEmpty))
+	{		
+	  var s = comp.getValue();
+	  var pattern=/^[A-Za-z]*[0-9]*$/;
+	  
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgChar);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isInteger">
+<FormalSpec>comp,msgEmpty,msgInteger</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (this.isEmpty(comp, msgEmpty))
+	{		
+	  var s = comp.getValue();
+	  var pattern = /^[0-9]*$/;
+	  
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgInteger);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isIntegerNotRequiredFilled">
+<FormalSpec>comp,msgInteger</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	  var s = comp.getValue();
+	  var pattern = /^[0-9]*$/;
+	   
+	  if((s!=null)||(s.length!=0)||(s!=""))
+	{
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgInteger);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+     }
+]]></Implementation>
+</Method>
+
+<Method name="isIntegerNotRequiredFilled810">
+<FormalSpec>comp,msgInteger</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	  var s = comp.getValue();
+	  var pattern = /^[0-9]{8,10}$/;
+	   
+	  if((s!=null)||(s.length!=0)||(s!=""))
+	{
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgInteger);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+     }
+]]></Implementation>
+</Method>
+
+<Method name="isIntegerINNNotRequiredFilled">
+<FormalSpec>comp,msgInteger</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	 var s = comp.getValue();
+	   var pattern = /^[0-9]{10}$/;
+	   
+	  if((s==null)||(s.length==0)||(s==""))
+	{return true;}
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgInteger);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+]]></Implementation>
+</Method>
+
+<Method name="isIntegerINN">
+<FormalSpec>comp,msgEmpty,msgInteger</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (this.isEmpty(comp, msgEmpty))
+	{		
+	  var s = comp.getValue();
+	  var pattern = /^[0-9]{10}$/;
+	  
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgInteger);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isDouble">
+<FormalSpec>comp,msgEmpty,msgDouble</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	 if (this.isEmpty(comp, msgEmpty))
+	{		
+	  var s = comp.getValue();
+	  var pattern = /^\d*\.{0,1}\d+$/;
+	  
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgDouble);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isDate">
+<FormalSpec>comp,msgEmpty,msgDate</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	 if (this.isEmpty(comp, msgEmpty))
+	{		
+	  var s = comp.findElement('control').value;
+	  
+	  var dat = s.substr(6,10);
+	  
+	  var pattern = /^(0[1-9]|1[0-9]|2[0-9]|3[01]).(0[1-9]|1[012]).[0-9]{4}$/;
+	  if (pattern.test(s) && parseInt(dat) > 1841)
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgDate);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isDateTime">
+<FormalSpec>comp,msgEmpty,msgDate</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	 if (this.isEmpty(comp, msgEmpty))
+	{		
+	  var s = comp.findElement('control').value;
+	  var pattern = /^(0[1-9]|1[0-9]|2[0-9]|3[01]).(0[1-9]|1[012]).[0-9]{4}\s{1}([0-1]\d|2[0-3])(:[0-5]\d){2}$/;
+	  if (pattern.test(s))
+	  {
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	  }
+	  else
+	  {
+	     this.modalMessage(msgDate);
+	     comp.setProperty('controlStyle','background-color: FF9999;');
+	     comp.focus();
+	     return false;
+	  }
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isDecimal">
+<Description>
+функция проверки на тип Decimal без обязательного заполнения поля</Description>
+<FormalSpec>comp,msgDecimal</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+ 
+	   var s = comp.getValue();
+	  var pattern = /^\d*\.{0,1}\d+$/;
+	  if (s=="")
+	  {
+		  return true;
+	   }
+	  else
+	  {
+	  	if (pattern.test(s))
+	  	{
+			comp.setProperty('controlStyle','background: white;');
+			return true;
+	  	}
+	  	else
+	  	{
+	     		this.modalMessage( msgDecimal);
+	  //   		comp.setValue('');
+	     		comp.setProperty('controlStyle','background-color: FF9999;');
+	     		comp.focus();
+	     		return false;
+	  	}
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isDoubleRange">
+<Description>
+функция проверки вводимой строки на наличие чисел с плавающей точкой в определенном диапазоне</Description>
+<FormalSpec>comp,min,max</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var s=comp.getValue();
+	if(!this.isDouble(s))
+		return false;
+	var num=parseFloat(s);
+	if ((num>=min) && (num<=max))
+	{
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	}
+	else
+	{
+		//this.modalMessage('Число не попадає в діапазон:'+min+'-'+max);
+		this.modalMessage(zenText('dontEnters')+min+'-'+max);
+		comp.setProperty('controlStyle','background-color: FF9999;');
+		comp.focus();
+		return false;
+	}
+]]></Implementation>
+</Method>
+
+<Method name="isInterval">
+<FormalSpec>comp,minVal,maxVal,msgEmpty,msgDouble</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	
+	 if (this.isDouble(comp, msgEmpty, msgDouble))
+  {		
+	var s=comp.getValue();
+	var num=parseFloat(s);
+	
+	if ((num>=minVal) && (num<=maxVal))
+	{
+		comp.setProperty('controlStyle','background: white;');
+		return true;
+	}
+	else
+	{
+		//this.modalMessage('Число не попадає в діапазон:'+minVal+' - '+maxVal+'. '+msgEmpty);
+		this.modalMessage(zenText('dontEnters')+minVal+' - '+maxVal+'. '+msgEmpty);
+		comp.setProperty('controlStyle','background-color: FF9999;');
+		comp.focus();
+		return false;
+	}
+  }
+]]></Implementation>
+</Method>
+
+<Method name="showGroup">
+<FormalSpec>group</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	group.show(' ','','',2,2);
+	//group.show();
+]]></Implementation>
+</Method>
+
+<Method name="ImportLanguages">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	// Import all the language XML files in the ...\csp\ide\language directory
+	Set dir = $$GetFilename^%apiCSP(%request.URL)
+	If $$$isWINDOWS Set dir = $translate(dir,"\","/")
+	If $$$isVMS {
+		Set dir = $piece(dir,"]")_".language]"
+	} Else {
+		Set dir = $piece(dir,"/",1,$length(dir,"/")-1)_"/language"
+	}
+	//&js<alert('#(dir)#')>
+	Do ImportDir^%occMessages(dir,"-d")
+]]></Implementation>
+</Method>
+
+<Method name="%OnCreatePage">
+<Description>
+This callback is called just after the server-side page 
+object is created but before its children are created.</Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ..ImportLanguages()
+	//Set %session.Language="ua"
+	//set %response.Language="ua"
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="modalMessageEventHandler">
+<FormalSpec>evt</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	//(evt.keyCode == 13) || (evt.which == 13) || 
+	if ((evt.keyCode == 13) || (evt.which == 13) || (evt.type == 'mousedown') || (evt.which == 27) || (evt.keyCode == 27)) { 
+		if (evt.stopPropagation) {
+			evt.stopPropagation();
+		}
+		evt.cancelBubble = true;
+		zenPage.endModal();
+		zenPage.resetKeyPasswordInput();
+	}
+	return false;
+]]></Implementation>
+</Method>
+
+<Method name="resetKeyPasswordInput">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var keyPassword = zen('keyPassword');
+	if (keyPassword) {
+		keyPassword.setValue('');
+		keyPassword.focus();
+	}
+]]></Implementation>
+</Method>
+
+<Method name="modalMessage">
+<Description>
+Показываем модальное окошко с сообщением (замена this.modalMessage())</Description>
+<FormalSpec>message,title,buttonCaption,messageStyle,width,height,exception</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+
+	if (zenPage.stopLoginProgress) {
+		zenPage.stopLoginProgress();
+	}
+	
+	var saveZenIsIE = zenIsIE
+	zenIsIE = false;
+	window.setTimeout('top.document.body.style.cursor = "default"', 20); // ole-off
+	
+	
+	if (ccxIsActiveModalMessage) return;
+	ccxIsActiveModalMessage = true;
+	if (!width) width = 400;
+	if (!height) height = null;
+	//if (!title) title = 'Повідомлення';
+	//if (!message) message = 'Текст повідомлення';
+	if (!title) title = zenText('message');
+	if (!message) message = zenText('textMess');
+	if (!buttonCaption) buttonCaption = 'OK';
+	
+	title = title.replace(/\'/g, "");
+	message = message.replace(/\'/g, "");
+	if (exception) exception = exception.replace(/\'/g, "");;
+	
+	var group = this.createComponent('modalGroup');
+	group.setProperty('id', 'ideModalGroup');
+	group.setProperty('onhideGroup', 'ccxIsActiveModalMessage = false; zenPage.resetKeyPasswordInput();');
+
+	var button = this.createComponent('button');
+	button.setProperty('caption', buttonCaption);
+	button.setProperty('id', 'ideModalGroupButton');
+	button.setProperty('controlStyle', 'width: 100px; margin-bottom: 10px;');
+	button.setProperty('onkeypress', 'return zenPage.modalMessageEventHandler(zenEvent);');
+	button.setProperty('onmousedown', 'return zenPage.modalMessageEventHandler(zenEvent);');
+	button.setProperty('onkeyup', 'if ((zenEvent.which == 27) || (zenEvent.keyCode == 27)) {return zenPage.modalMessageEventHandler(zenEvent);};');  //Chrome for ESC
+	button.setProperty('onclick', 'return false;');
+	
+	var mainText = this.createComponent('label');
+	mainText.setProperty('id', 'ideModalGroupText');
+	
+	group.addChild(mainText);
+	
+	// Если передан текст исключения и установлен параметр конфигурации AppShowExceptionInfo
+	var showException = exception && !! parseInt(zenPage.getConfigurationProperty("AppShowExceptionInfo"));
+	if (showException) {
+		var exText = this.createComponent('label');
+		exText.setProperty('id', 'ideModalGroupExText');
+		group.addChild(exText);
+	}
+	
+	group.addChild(button);
+
+	group.show(title, 'dynamic', null, null, null, width, height);
+	if (messageStyle) mainText.setProperty('enclosingStyle', messageStyle);
+	button.setProperty('enclosingStyle', 'text-align: center;');
+	
+	// dirty hack - fucked ZEN
+	window.setTimeout("zen('ideModalGroupText').setValue('" + message + "');", 250);
+	window.setTimeout("zen('ideModalGroupButton').focus()", 150);
+	
+	if (showException) {
+		//window.setTimeout("zen('ideModalGroupExText').setValue('Технічна інформація:<blockquote>" + exception + "</blockquote>');", 250);
+		window.setTimeout("zen('ideModalGroupExText').setValue(zenText('info')+'<blockquote>" + exception + "</blockquote>');", 250);
+	}
+	group.getFloatingDiv().style.backgroundColor = "white";
+	
+	zenIsIE = saveZenIsIE; 
+	
+	self.document.getElementById("zenMouseTrap").onmouseup = null;
+]]></Implementation>
+</Method>
+
+<Method name="modalErrorMessage">
+<Description>
+Показываем модальное окошко с сообщением об ошибке</Description>
+<FormalSpec>title,message,exception</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	
+	//if (!title) title = 'Ошибка';
+	//if (!message) message = 'Текст сообщения';
+	if (!title) title = zenText('error');
+	if (!message) message = zenText('mess') ;
+	if (!exception) exception = null;
+	
+	zenPage.modalMessage(title, message, null, 'color: red; text-align: center;', null, null, exception);
+]]></Implementation>
+</Method>
+
+<Method name="SelectDrawCell">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pTable:%ZEN.Component.tablePane,pName:%String,pSeed:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+   &html<<a href="javascript:zenPage.selectItem();">
+   <div class="background-SelectTerr" align="center"
+   	   >
+	</div>
+   </a>
+   >
+   
+   Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="SelectDrawCell1">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pTable:%ZEN.Component.tablePane,pName:%String,pSeed:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+   &html<<a href="javascript:zenPage.saveItem();">
+   <div class="background-SelectTerr" align="center"
+   	   >
+	</div>
+   </a>
+   >
+   
+   Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="%OnDrawHTMLBody">
+<Description><![CDATA[
+This callback is called at the start of the HTML BODY section of the page.<br/>
+(default implementation is a simple expression).]]></Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	    // Инициализация часиков
+	&html<<script type="text/javascript">
+		top.serverDateUTC = "#($zd($h, 8))#";
+		top.serverTimeUTC = "#($replace($ztime($p($h, ",", 2), 1), ":", ""))#";
+		top.SESSIONTIMEOUT = #(%session.AppTimeout)# - 30;
+		top.sessionTimeout = #(%session.AppTimeout)# - 30;
+		var dtTmpWin = window;
+		while (dtTmpWin) {
+			dtTmpWin.sessionTimeout = top.sessionTimeout
+			dtTmpWin = dtTmpWin.opener;
+		}
+	</script>>
+
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="showProgressBar">
+<Description>
+отображение блокирующей заставки</Description>
+<FormalSpec>message</FormalSpec>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	//if (!message) message = 'Будь ласка зачекайте!';
+	if (!message) message = zenText('pleaseWait');
+	var mainProgressBox=document.getElementById('mainProgressBox');
+	var msgProgressbox=document.getElementById('msgProgressbox');
+	mainProgressBox.style.top =0+"px";
+	mainProgressBox.style.left =0+"px";
+	mainProgressBox.style.opacity = "0.5";
+	mainProgressBox.style.height = document.body.clientHeight+"px";
+	mainProgressBox.style.width = document.body.offsetWidth +"px";
+	mainProgressBox.style.visibility = 'visible';
+	/// сообщение выводимое на экран в момент блокировки
+	msgProgressbox.style.top = document.body.scrollTop + document.body.clientHeight / 2 - 100+"px";
+	msgProgressbox.style.left = document.body.offsetWidth / 2 - 250+"px";
+	msgProgressbox.style.visibility = 'visible';
+	msgProgressbox.innerHTML=message;
+	document.body.style.cursor = 'progress'
+	return true
+]]></Implementation>
+</Method>
+
+<Method name="hiddenProgressBar">
+<Description>
+скрытие блокирующей заставки</Description>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var mainProgressBox=document.getElementById('mainProgressBox');
+	var msgProgressbox=document.getElementById('msgProgressbox');
+
+	msgProgressbox.style.visibility = 'hidden';
+	mainProgressBox.style.visibility = 'hidden';
+	document.body.style.cursor = 'auto'
+	return true
+]]></Implementation>
+</Method>
+
+<Method name="setTimer">
+<Description>
+метод запускающий блокировку экрана и выполняющи функцию getResult
+message-сообщение выводимое на экран
+time-интервал опроса функции
+duration-длительность блокирования(если getResult() зависает окно разблокируется)</Description>
+<FormalSpec>message,time,duration</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (!time) time = 30;
+	if (!duration) duration = 6000;
+	if (!message) message = 'Будь ласка зачекайте!';
+	var timerMulti;
+	var res=1;
+	var mainForm=zenPage.showProgressBar(message);
+	timerMulti = window.setInterval(function() 
+	 { 
+	 if(res)		
+		{
+			res=zenPage.getResult();
+			duration=duration-time;
+			if(duration<=0){
+				res=0;
+			}
+		}				
+		else
+		{
+			window.clearInterval(timerMulti);
+			zenPage.hiddenProgressBar();
+		}
+		
+	 },time);
+]]></Implementation>
+</Method>
+
+<Method name="getResult">
+<Description>
+метод выполняющийся во время блокировки экрана
+для разблокировки метод должен возвращать 0</Description>
+<Abstract>1</Abstract>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	return 0;
+]]></Implementation>
+</Method>
+
+<Method name="%OnUseSoftModals">
+<ClassMethod>1</ClassMethod>
+<CodeMode>expression</CodeMode>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[0
+]]></Implementation>
+</Method>
+
+<Method name="clickItemMenu">
+<Description>
+Обработчик кликов по пунктам меню</Description>
+<FormalSpec>src,name,width,height</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (src=='') return;
+	if ((name=='')||(name==undefined)) name='popupWindow';
+	if ((width=='')||(width==undefined)) width=700;
+	if ((height=='')||(height==undefined)) height=400;
+	var param='status,scrollbars,resizable=no,modal=yes,width='+width+',height='+height+"'";
+	zenPage.launchPopupWindow(zenLink(src),name,	param);
+]]></Implementation>
+</Method>
+
+<Method name="delSubStr">
+<Description>
+Удаление подстроки из строки</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>str:%String,suStr:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	q $REPLACE(str,suStr,"")
+]]></Implementation>
+</Method>
+
+<Method name="GetFileData">
+<Description>
+получаем данные из файла
+fileID- id файла</Description>
+<FormalSpec>fileID:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s data=""
+	d GetFileData^sys(fileID,.data)
+	q data
+]]></Implementation>
+</Method>
+
+<Method name="SetFileData">
+<Description>
+записываем данные в файл
+fileID- id файла</Description>
+<FormalSpec>fileID:%String,data:%String</FormalSpec>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	d SetFileData^sys(fileID,data)
+]]></Implementation>
+</Method>
+
+<Method name="GetProjectsDir">
+<Description>
+возвращаем директорию для проектов. Настраивается для всей студии</Description>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	q $g(^ide("config","projectDir"),"")
+]]></Implementation>
+</Method>
+
+<Method name="GetHostIP">
+<Description>
+возвращаем IP сервера</Description>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	q $g(^ide("config","hostIP"),"")
+]]></Implementation>
+</Method>
+
+<Method name="GetHostPort">
+<Description>
+возвращаем порт сервера</Description>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	q $g(^ide("config","hostPort"),"")
+]]></Implementation>
+</Method>
+
+<Method name="%OnGetJSResources">
+<FormalSpec><![CDATA[&pResources:%String]]></FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s pResources("pleaseWait") = $$$Text("Будь ласка зачекайте!")
+	s pResources("error") = $$$Text("Ошибка!")
+	s pResources("mess") = $$$Text("Текст сообщения")
+	s pResources("info") = $$$Text("Технічна інформація:")
+	s pResources("message") = $$$Text("Повідомлення")
+	s pResources("dontEnters") = $$$Text("Число не попадає в діапазон:")
+	s pResources("textMess") = $$$Text("Текст повідомлення")
+	s pResources("proj") = $$$Text("Вибраний проект: ")
+	s pResources("cannotOp") = $$$Text("Файл неможливо відкрити!")
+	s pResources("choseDel") = $$$Text("Виберіть запис для вилучення.")
+	s pResources("qDel") = $$$Text("Ви бажаєте вилучити запис?")
+	s pResources("choseEdit") = $$$Text("Виберіть запис для редагування.")
+	s pResources("chose") = $$$Text("Виберіть запис для редагування.")
+	s pResources("ques") = $$$Text("Ви бажаєте вилучити запис?")
+	s pResources("MyId") = $$$Text("Увага! В якості вхідних даних для нового шаблону проекта,будуть використані дані з відкритого на цей час проекту.")
+	s pResources("MyId2") = $$$Text("Увага! Буде змінено лише назву шаблону, склад і зміст файлів у шаблону корегується через табличну частину 'Файли'")
+	q $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

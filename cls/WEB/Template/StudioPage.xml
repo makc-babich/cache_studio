@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.Template.StudioPage">
+<Abstract>1</Abstract>
+<Super>WEB.Template.Object</Super>
+<TimeCreated>63138,53153.299178</TimeCreated>
+
+<Method name="%OnDrawHTMLHead">
+<Description><![CDATA[
+This callback is called at the end of the HTML HEAD section of the page.<br/>
+(default implementation is a simple expression).]]></Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Write "<meta http-equiv='cache-control' content='no-cache, must-revalidate'>",!
+	Write "<meta http-equiv='expires' content='-1'>",!
+	;Write "<meta http-equiv='pragma' content='no-cache'>",!
+
+  q $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

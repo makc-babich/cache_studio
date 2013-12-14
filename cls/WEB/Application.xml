@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.Application">
+<Description>
+IDE.Application</Description>
+<Super>%ZEN.application</Super>
+<TimeCreated>63094,61569.923062</TimeCreated>
+
+<Parameter name="APPLICATIONNAME">
+<Description>
+Это имя этого приложения.</Description>
+<Default>IDE</Default>
+</Parameter>
+
+<Parameter name="HOMEPAGE">
+<Description>
+Это URL главной стартовой страницы этого приложения.</Description>
+<Default>WEB.Main.cls</Default>
+</Parameter>
+
+<Parameter name="CSSINCLUDES">
+<Description>
+Добавляем css </Description>
+<Expression>"ide.css, style/layout-default.css, codemirror/lib/codemirror.css, codemirror/addon/hint/show-hint.css, codemirror/addon/display/fullscreen.css, codemirror/addon/dialog/dialog.css, codemirror/addon/lint/lint.css, codemirror/theme/solarized.css, codemirror/theme/xq-light.css, codemirror/theme/xq-dark.css"</Expression>
+</Parameter>
+
+<Parameter name="JSINCLUDES">
+<Description>
+Добавляем js</Description>
+<Type>STRING</Type>
+<Expression>"js/CipherAPI.js, js/clock.js, js/jquery-2.0.3.min.js, codemirror/lib/codemirror.js, codemirror/addon/hint/show-hint.js, codemirror/addon/hint/xml-hint.js, codemirror/mode/xml/xml.js, codemirror/addon/display/fullscreen.js, codemirror/addon/dialog/dialog.js, codemirror/addon/search/searchcursor.js, codemirror/addon/search/search.js, codemirror/addon/hint/javascript-hint.js, codemirror/mode/javascript/javascript.js, codemirror/addon/fold/xml-fold.js, codemirror/addon/edit/matchtags.js, codemirror/addon/hint/html-hint.js, codemirror/addon/mode/loadmode.js, codemirror/mode/css/css.js, codemirror/addon/hint/css-hint.js, codemirror/mode/htmlmixed/htmlmixed.js, codemirror/addon/edit/closebrackets.js, codemirror/addon/edit/closetag.js, codemirror/addon/lint/lint.js, codemirror/addon/lint/annotation/jshint.js, codemirror/addon/lint/annotation/csslint.js, codemirror/addon/lint/javascript-lint.js, codemirror/addon/lint/css-lint.js, codemirror/addon/selection/mark-selection.js, codemirror/addon/fold/foldcode.js , codemirror/addon/fold/foldgutter.js, codemirror/addon/fold/brace-fold.js, codemirror/addon/fold/xml-fold.js, codemirror/addon/fold/comment-fold.js"</Expression>
+</Parameter>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля приложения.</Description>
+<Data><![CDATA[
+<style type="text/css">
+.CodeMirror {
+        border: 1px solid #eee;
+        height: auto;
+      }
+.CodeMirror-scroll {
+        overflow-y: hidden;
+        overflow-x: auto;
+      }
+.CodeMirror-matchingtag { background: rgba(255, 150, 0, .3); }
+
+.dragHeaderText {
+	color:black;
+	font-weight:normal;
+}
+
+.dragHeader {
+  background-color:#9C9A8D;
+  background-image:none;
+  
+}
+ /*стиль для полосы прокрутки */    
+#body{}
+ 
+::-webkit-scrollbar {
+width: 10px;
+height: 5px;
+}
+ 
+::-webkit-scrollbar-track-piece {
+background-color: #ffffff;
+-webkit-border-radius: 0px;
+}
+ 
+::-webkit-scrollbar-thumb:vertical {
+height: 5px;
+background-color: #999;
+-webkit-border-radius: 0px;
+}
+ 
+::-webkit-scrollbar-thumb:vertical:active {
+height: 5px;
+background-color: #777;
+-webkit-border-radius: 0px;
+}
+ 
+::-webkit-scrollbar-thumb:horizontal {
+width: 5px;
+background-color: #999;
+-webkit-border-radius: 0px;
+}
+ 
+::-webkit-scrollbar-thumb:horizontal:active {
+height: 5px;
+background-color: #777;
+-webkit-border-radius: 0px;
+}
+
+/*стиль для группировочных маркеров редактора */ 
+.CodeMirror-foldmarker {
+        color: blue;
+        text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
+        font-family: arial;
+        line-height: .3;
+        cursor: pointer;
+      }
+      .CodeMirror-foldgutter {
+        width: 0.9em;
+      }
+      .CodeMirror-foldgutter-open,
+      .CodeMirror-foldgutter-folded {
+        color: #555;
+        cursor: pointer;
+      }
+      .CodeMirror-foldgutter-open:after {
+        content: "\25BC";
+      }
+      .CodeMirror-foldgutter-folded:after {
+        content: "\25BA";
+      }
+html {
+height: 10%;
+}     
+</style>
+]]></Data>
+</XData>
+</Class>
+</Export>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Util.SourceControl">
+<Super>%Studio.SourceControl.File</Super>
+<TimeCreated>63127,57173.302517</TimeCreated>
+
+<XData name="Menu">
+<Data><![CDATA[
+<MenuBase>
+
+ <Menu Name="Версионность" Type="0">
+ <MenuItem Name="Загрузка классов" Enabled="1"/>
+ </Menu>
+ </MenuBase>
+]]></Data>
+</XData>
+
+<Method name="UserAction">
+<Description>
+метод для обработки пунктов меню, которые созданы в блоке XData Menu</Description>
+<FormalSpec><![CDATA[Type:%Integer,Name:%String,InternalName:%String,SelectedText:%String,&Action:%String,&Target:%String,&Msg:%String,&Reload:%Boolean]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+	if (Type=0) && (Name="Версионность,Загрузка классов")
+	{
+		d ..importAllClass()
+		;set Action=3,Target="",Reload=0
+	}
+	else {
+		;Set Action=0,Target="",Reload=0
+	} 
+	
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="importAllClass">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s dir=$GET(^Source("SourceDirWin"),"")
+	q:dir=""
+	d $system.OBJ.ImportDir("D:\CacheSourceControl\Studio\trunk\src\","*.xml","c")
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="SetUp">
+<Description>
+Настроить контроль версий и выгрузить все классы в файлы</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	// Глобаль ^Sources содержит настройку контроля версий
+	// ^Sources -- путь к папке с исходниками
+	// ^Sources(ext,"*") -- путь к конкретному расширению
+	kill ^Sources
+	set ^Sources="D:/CacheSourceControl/Studio/trunk/src/"
+	set ^Sources("CLS","*")="cls/"
+	
+	set SourceControl=..%New("")
+	set sc=$$$OK
+	
+	&sql(declare SU1 cursor for
+		select ID into :class 
+		from %Dictionary.ClassDefinition where NOT (ID %STARTSWITH '%'))
+	&sql(open SU1)
+	for {
+		&sql(fetch SU1)
+		quit:SQLCODE
+		set sc=SourceControl.OnAfterSave(class_".CLS")
+		quit:'sc
+	}
+	
+	quit sc
+]]></Implementation>
+</Method>
+
+<Method name="OnAfterSave">
+<Description>
+Немного измененный OnAfterSave из класса %Studio.SourceControl.File</Description>
+<FormalSpec>InternalName:%String,Object:%RegisteredObject</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set filename=..ExternalName(InternalName)
+	#; File not mapped so nothing to do
+	If filename="" Quit $$$OK
+	Set name=$Piece(InternalName,".",1,$Length(InternalName,".")-1)
+	#; CSP files are already files so not additional work needed
+	If name["/" Quit $$$OK
+	Set ext=$ZConvert($Piece(InternalName,".",$Length(InternalName,".")),"U")
+	#; Do not export the default projects
+	If ext="PRJ",$zconvert($extract(name,1,$length("default_")),"l")="default_" Quit $$$OK
+	#; By convention items starting with Z,z,%z,%Z are not exported
+	If (ext="PRJ")||($extract($translate(name,"Z%","z"))="z") Quit $$$OK
+	#; If time already matches nothing to do
+	If ##class(%RoutineMgr).TS(InternalName)=$get(^Sources(0,"ItemTimeStamp",InternalName)) Quit $$$OK
+	If ##class(%File).Exists(filename),##class(%File).ReadOnly(filename) Write !,"File ",filename," is read only, not exporting" Quit $$$OK
+	Do ##class(%File).CreateDirectoryChain(##class(%File).GetDirectory(filename))
+	Set sc=$$Export^%occXMLExport(filename,"-d /diffexport",InternalName)
+	If $$$ISOK(sc) {
+		Write !,"Exported '",InternalName,"' to file '",filename,"'"
+		Set ^Sources(0,"FileTimeStamp",InternalName)=$zu(140,2,filename,1)
+		Set ^Sources(0,"ItemTimeStamp",InternalName)=##class(%RoutineMgr).TS(InternalName)
+	} Else {
+		Do DecomposeStatus^%apiOBJ(sc,,"d")
+		Quit sc
+	}
+	Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

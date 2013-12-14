@@ -1,0 +1,1115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.Template.AbstractMain">
+<Abstract>1</Abstract>
+<Super>WEB.Template.StudioPage</Super>
+<TimeCreated>63094,61783.341917</TimeCreated>
+
+<Property name="showdirectoryonly">
+<Description>
+Whether to show directory only or with files</Description>
+<Type>%ZEN.Datatype.string</Type>
+<Parameter name="ZENURL" value="showdirectoryonly"/>
+</Property>
+
+<Property name="FileName">
+<Description>
+Original File name passed in (optional)</Description>
+<Type>%ZEN.Datatype.string</Type>
+<Parameter name="ZENURL" value="File"/>
+</Property>
+
+<Property name="settingsExpanded">
+<Description>
+If true, the settings area is visible.</Description>
+<Type>%Boolean</Type>
+<Internal>1</Internal>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<Property name="propertyExpanded">
+<Description>
+If true, the settings area is visible.</Description>
+<Type>%Boolean</Type>
+<Internal>1</Internal>
+<InitialExpression>0</InitialExpression>
+</Property>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Parameter CSSINCLUDES = {"ide.css, style/layout-default.css, codemirror/lib/codemirror.css, codemirror/addon/hint/show-hint.css, codemirror/addon/display/fullscreen.css, codemirror/addon/dialog/dialog.css, codemirror/addon/lint/lint.css, codemirror/theme/solarized.css"};
+
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Parameter JSINCLUDES As STRING = {"js/CipherAPI.js, js/clock.js, codemirror/lib/codemirror.js, codemirror/addon/hint/show-hint.js, codemirror/addon/hint/xml-hint.js, codemirror/mode/xml/xml.js, codemirror/addon/display/fullscreen.js, codemirror/addon/dialog/dialog.js, codemirror/addon/search/searchcursor.js, codemirror/addon/search/search.js, codemirror/addon/hint/javascript-hint.js, codemirror/mode/javascript/javascript.js, codemirror/addon/fold/xml-fold.js, codemirror/addon/edit/matchtags.js, codemirror/addon/hint/html-hint.js, codemirror/mode/css/css.js, codemirror/addon/hint/css-hint.js, codemirror/mode/htmlmixed/htmlmixed.js, codemirror/addon/edit/closebrackets.js, codemirror/addon/edit/closetag.js, codemirror/addon/lint/lint.js, codemirror/addon/lint/annotation/jshint.js, codemirror/addon/lint/annotation/csslint.js, codemirror/addon/lint/javascript-lint.js, codemirror/addon/lint/css-lint.js, codemirror/addon/selection/mark-selection.js, codemirror/addon/fold/foldcode.js , codemirror/addon/fold/foldgutter.js, codemirror/addon/fold/brace-fold.js, codemirror/addon/fold/xml-fold.js, codemirror/addon/fold/comment-fold.js"};
+
+]]></Content>
+</UDLText>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля страницы.</Description>
+<Data><![CDATA[
+<style type="text/css">
+#menuPane{
+	position: relative;
+	background: rgb(156,154,141);
+	height: 449px;
+	width: 350px;
+	border-right: 0px solid black;
+	border-bottom: 0px solid black;
+	/*display: none;*/
+}
+#propertyPane{
+	position: relative;
+	background: rgb(156,154,141);
+	height: 449px;
+	width: 449px;
+	border-right: 0px solid black;
+	border-bottom: 0px solid black;
+	/*display: none;*/
+}
+#pageContent{
+	border: 0px solid black;
+}
+#menuTitle,#propertyTitle {
+	height: 40px;
+	width: 40px;
+}
+#spanArrow,#spanArrow1 {
+	padding-left: 5px;
+	padding-right: 5px;
+	/*color: darkblue;*/
+	color: white;
+	font-size: 20pt;
+	text-shadow: black 1px 1px 1px;
+}
+#imExit{
+	background: url('images/exit.png') repeat-x;
+
+}
+#imExit1:hover{
+	background: url('images/exit2.png') repeat-x;
+
+}
+#view {
+	/*width: 90%;*/
+	/*height: 380px;*/
+	overflow: auto;
+	border: 0px solid black;
+}
+a.menuItem {
+	color: black;
+}
+
+#snapGrid {
+	border: 1px solid #9C9A8D;
+	/*width: 90%*/
+	/*height: 550px;*/
+	/*background-color:#9C9A8D;*/
+}
+
+iframe {
+        width: 100%;
+        float: left;
+        height: 600px;
+        border: 0px solid black;
+        border-left: 0px;
+      }
+   .background-SelectTerr { 
+	height:16px;
+	width:16px;
+	background: url(images/16x16/add_cod.png) no-repeat;
+   }   
+   
+.CodeMirror pre { font-size: 14px; font-family:verdana;}
+.CodeMirror span {font-size: 14px; font-family:verdana;}
+</style>
+]]></Data>
+</XData>
+
+<XData name="Contents">
+<Description>
+Этот XML блок описывает содержимое этой страницы.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<page xmlns="http://www.intersystems.com/zen" height="100%" >
+
+<hgroup width="100%">
+<hmenu id="mainMenuLevel1"  valign="bottom" width="100%">
+<image src="images/32x32/logo.png"/>
+
+<menu id="file" caption="Файл" layout="vertical">
+<menuItem id="addProject" caption="Додати проект" onclick="zenPage.newObject('project','1');" image="images/16x16/application_add.png"/>
+<menuItem id="addFolder" caption="Додати пакет" onclick="zenPage.newObject('folder');" image="images/16x16/folder_add.png"/>
+<menuItem id="addPage" caption="Додати файл"  onclick="zenPage.newObject('file');"  image="images/16x16/page_add.png"/>
+<menuItem id="linkFile" caption="Додати посилання на файл"  onclick="zenPage.onlinkFile();"  image="images/16x16/accept.png"/>
+
+<menuItem id="copyPage" caption="Копіювати файл" image="images/16x16/page_copy.png" hidden="true"/>
+<menuSeparator/>
+<menuItem id="savePage" caption="Зберегти файл" onclick="zenPage.savePage();"  image="images/16x16/save.png"/>
+</menu>
+<menu id="tools" caption="Інструменти" layout="vertical">
+<!--
+<menuItem id="appBilding" caption="Зібрати проект" onclick="zenPage.compileProject();"  image="images/16x16/compile.png"/>
+<menuItem id="pageBilding" caption="Згенерувати сторінку" image="images/16x16/generate_page.png"/>
+-->
+<menuItem id="previewPage" caption="Перегляд" onclick="zenPage.updatePreview();" image="images/16x16/refresh.png"/>
+<menu caption="Шаблони" image="images/16x16/template.png" layout="vertical">
+<menuItem caption="Проект" image="images/16x16/project_template.png" onclick="zenPage.clickItemMenu('WEB.CardListProject.cls','ListProject');"/>
+<menuItem caption="Файл" image="images/16x16/file_template.png" onclick="zenPage.clickItemMenu('WEB.ListFile.cls','ListFile');"/>
+</menu>
+<menuItem id="settings" caption="Налаштування" onclick="zenPage.showIDEConfig();" image="images/16x16/tools.png"/>
+</menu>
+<spacer width="100%" />
+<html><div id="nppsClockDiv"></div></html>
+<image src="images/32x32/Ukraine.png" onclick="zenPage.UALang()"/>
+<image src="images/32x32/Russia.png" onclick="zenPage.RULang()" />
+<!--<image align="right" id="imExit"  onclick="zenPage.ExitSystem();" width="24" height="24"/>-->
+</hmenu>
+</hgroup>
+<hgroup width="100%" height="100%" valign="top">
+<vgroup id="menuPane" valign="top">
+<html id="menuTitle" valign="top" >
+<span id="spanArrow" title="Показати або сховати панель" onclick="zenPage.toggleSettings();" onmouseover="this.style.color='#FFEEAA';" onmouseout="this.style.color='';">&#171;</span>
+</html>
+<group id="viewFiles">
+<label id="namePRJ" label="Виберіть проект..."/>
+<combobox id="Lookin" label="Перегляд в:" name="Lookin" size="53" onchange="zenPage.changeDrive(zenThis);" />
+<hgroup cellVAlign="middle" labelPosition="left">
+<html> <img class="dsptIcon" src='images/16x16/application_add.png' title="Додати проект" onclick="zenPage.newObject('project',1);" style="height:16px;" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html> <img class="dsptIcon" src='images/16x16/folder_add.png' title="Додати пакет" onclick="zenPage.newObject('folder');" style="height:16px;" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html> <img class="dsptIcon" src='images/16x16/page_add.png' title="Додати файл" onclick="zenPage.newObject('file');" style="height:16px;" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html hidden="true"> <img class="dsptIcon" src='images/16x16/page_copy.png' title="Копіювати файл" onclick="" style="height:16px;" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html> <img class="dsptIcon" src='images/16x16/delete.png' title="Вилучити" onclick="zenPage.deleteObject();" style="height:16px;" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html> <img class="dsptIcon" src='images/16x16/accept.png' title="Додати посилання на файл" onclick="zenPage.onlinkFile();" style="height:16px;" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<spacer width="190"/>
+<html> <img class="dsptIcon" src='images/16x16/folder_up.png' title="Вийти з пакету" onclick="zenPage.upOneLevel();" style="height:16px;" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+</hgroup>
+<dynaView id="view" 
+	viewType="details" 
+	OnGetViewContents="GetViewContents"
+	rows="15"
+	onselect="zenPage.itemSelected(zenThis);"
+	onclick="zenPage.itemClicked(zenThis);" >	
+	<parameter paramName="Dir" value="" />
+	<parameter paramName="wildcard" value="*" />
+	<parameter paramName="showdirectoryonly" value="0" />	 
+	<parameter paramName="sortby" value="Type" />
+</dynaView>
+</group>
+<pane id="mainMenu" paneName="mainMenu" valign="top"/>
+</vgroup>
+<vgroup  id="pageContent" valign="top" >
+<hgroup >
+<html> <img class="dsptIcon" title="Зберегти зміни" onclick="zenPage.savePage();" style="height:24px;" src="images/32x32/save.png" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html> <img class="dsptIcon" title="Додати JS файл" onclick="zenPage.insertFileJS();" style="height:24px;" src="images/32x32/js.png" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html> <img class="dsptIcon" title="Додати CSS файл" onclick="zenPage.insertFileCSS();" style="height:24px;" src="images/32x32/css.png" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<spacer width="20"/>
+<html> <img class="dsptIcon" title="Перегляд" onclick="zenPage.updatePreview();" style="height:24px;" src="images/32x32/refresh.png" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+
+<!--
+<html> <img class="dsptIcon" title="Зібрати проект" onclick="zenPage.compileProject();" style="height:24px;" src="images/32x32/compile.png" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+<html> <img class="dsptIcon" title="Згенерувати сторінку" onclick="zenPage.compilePage();" style="height:24px;" src="images/32x32/generate_page.png" onmouseover="this._oldClass=this.className;this.className='dsptIconHover';" onmouseout="this.className=this._oldClass;" /></html>
+-->
+
+</hgroup>
+<snapGrid id="snapGrid" cols="6" rows="6" >
+<!--<desktop id="desktop" >-->
+<dragGroup id="dgHTML" header="HTML" headerLayout="IFT" homeCol="0"  homeRow="0" colSpan="4" rowSpan="3"
+ imageMaximize="images/16x16/maximize.png" imageMinimize="images/16x16/minimize.png" 
+  imageContract="images/16x16/close_up.png" imageExpand="images/16x16/expand.png" >
+<!-- html представление -->
+<html>
+<textarea id="codeHTML"  name="codeHTML" dropEnabled="true">
+</textarea>
+</html>
+</dragGroup>
+<dragGroup id="dgCSS" header="CSS" headerLayout="IFT" homeCol="4"  homeRow="0" colSpan="2" rowSpan="3"
+imageMaximize="images/16x16/maximize.png" imageMinimize="images/16x16/minimize.png" 
+  imageContract="images/16x16/close_up.png" imageExpand="images/16x16/expand.png" >
+<!-- css -->
+<html>
+<textarea id="codeCSS"  name="codeCSS" >
+</textarea>
+</html>
+</dragGroup>
+<dragGroup id="dgJS" header="JS" headerLayout="IFT" homeCol="0"  homeRow="3" colSpan="4" rowSpan="3"
+imageMaximize="images/16x16/maximize.png" imageMinimize="images/16x16/minimize.png" 
+  imageContract="images/16x16/close_up.png" imageExpand="images/16x16/expand.png" >
+<!-- javacript -->
+<html>
+<textarea id="codeJS"  name="codeJS" >
+</textarea>
+</html>
+</dragGroup>
+<dragGroup id="dgVIEW" header="Перегляд" headerLayout="IFT" homeCol="4"  homeRow="3" colSpan="2" rowSpan="3"
+imageMaximize="images/16x16/maximize.png" imageMinimize="images/16x16/minimize.png" 
+  imageContract="images/16x16/close_up.png" imageExpand="images/16x16/expand.png" >
+  <!-- view -->
+<iframe id='previewHTML'></iframe>
+</dragGroup>
+
+<!--</desktop>-->
+
+</snapGrid>
+
+</vgroup>
+<vgroup id="propertyPane" valign="top">
+<html id="propertyTitle" valign="top" >
+<span id="spanArrow1" title="Показати або сховати панель" onclick="zenPage.propertySettings();" onmouseover="this.style.color='#FFEEAA';" onmouseout="this.style.color='';">&#171;</span>
+</html>
+<group id="contentProperty"  valign="top">
+<tabGroup id="tabTools" showBody="true" remember="true" showTabBar="true" width="100%" height="100%">
+
+<tab caption="Інструменти">
+<group labelPosition="left">
+<radioSet id="typeFiles" label="Тип класу:" displayList="html,javascript,css" valueList="html,js,css" value="html" onclick="zenPage.changeTypeFile(zenThis.value);"/>
+</group>
+<spacer height="5"/>
+<!-- Отображение файлов выбранного типа-->
+<html id="htmlFileContent" OnDrawContent="DrawFileContent"/>
+
+</tab>
+<tab caption="Серверні методи">
+<hgroup labelPosition="left">
+<label id="namespacesLabel" label="Область:" />
+<button caption="Вибрати" onclick="zenPage.switchNamespace();"/>
+</hgroup>
+<group labelPosition="left">
+<radioSet id="typeClass" label="Тип класу:" displayList="rest,webSocked" valueList="rest,websocked" value="rest" onclick="zenPage.changeTypeClass();"/>
+</group>
+<!-- Классы в выбраной области-->
+<hmenu id="menuCL" width="100%" hidden="false">
+<menuItem            id ="menuInsertCL" caption="Додати" 
+					onclick="zenPage.newItemCL();"
+					help="Додати новий запис"
+					image="images/16x16/record_add.png"
+					/>
+
+<menuItem            id ="menuDeleteCL" caption="Оновити" 
+					onclick="zenPage.reloadCL();"
+					help="Оновити список класів"
+					image="images/16x16/reload.png"
+					/>
+</hmenu>
+<!-- Отображение классов в выбранной области и выбранного типа-->
+<html id="htmlSCContent" OnDrawContent="DrawSCContent"/>
+<spacer height="5"/>
+<!-- Методы выбранном классе-->
+<hmenu id="menuSM" width="100%" hidden="false">
+<menuItem            id ="reloadSM" caption="Оновити" 
+					onclick="zenPage.reloadSM();"
+					help="Оновити список методів"
+					image="images/16x16/reload.png"
+					/>
+
+</hmenu>
+<!-- Отображение классов в выбранной области и выбранного типа-->
+<html id="htmlSMContent" OnDrawContent="DrawSMContent"/>
+</tab>
+<!--
+<tab caption="Налаштування" >
+<text label="RootURL:" id="RootURL" size="60" />
+<text label="applicationRootPath:" id="applicationRootPath" size="60" />
+<text label="outputRootPath:" id="outputRootPath" size="60" />
+<text label="jsScriptMode:" id="jsScriptMode" size="60" />
+<text label="jsScriptPath:" id="jsScriptPath" size="60" />
+<text label="jsScriptOutputPath:" id="jsScriptOutputPath" size="60" />
+<text label="Start page:" id="defaultPage" size="60" />
+
+<button align="center" caption="Зберегти" controlStyle="width: 200px; height: 24px;" onclick="zenPage.onClickPropertyPRJ();"/>
+</tab>
+-->
+</tabGroup>
+</group>
+</vgroup>
+</hgroup>
+
+<modalGroup id="nameObject" groupTitle="Назва" groupStyle="padding: 10px;">
+<text id="newName" size="100" />
+<!-- Элементы управления для создания файлов-->
+<hgroup>
+<radioSet id="typeFile" label="Тип файлу" displayList="html,javascript,css" valueList="html,js,css" value="html"  hidden="true"  onclick="zenPage.changeTemplateFiles(zenThis.getValue());"/>
+<dataCombo label="Шаблон" id="listFile" name="listFile" size="40"
+	dropdownWidth="auto"
+	editable="true"
+	searchKeyLen="20"
+	comboType="image"
+	buttonCaption="Вибрати"
+	buttonTitle="Шаблон файлу за яким буде побудовано файл"
+	sql="SELECT ID, toolsFileName FROM METADATA.File WHERE (%ALPHAUP(toolsFileName) %STARTSWITH %ALPHAUP(?)) AND (projectID is null) AND (fileType = ?)"
+	sqlLookup="SELECT projectName FROM METADATA.File WHERE ID=?"
+	displayColumns="2"
+	choiceColumn="2"
+	valueColumn="1"
+	maxRows="500"
+ 	hidden="true">
+	<parameter id="pTypeFile" value="html"/>
+	</dataCombo>
+</hgroup>
+<!-- Элементы управления для создания проекта-->
+<hgroup width="100%" labelPosition="left">
+<checkbox id="templateProject" caption="Застосувати шаблон" value="0" hidden="true" onclick="zenPage.changeTemplateProject(zenThis.getValue());"/>
+<dataCombo label="Шаблон" id="listProject" name="listProject" size="40"
+	dropdownWidth="auto"
+	editable="true"
+	searchKeyLen="20"
+	comboType="image"
+	buttonCaption="Вибрати"
+	buttonTitle="Шаблон проекту за яким буде побудовано проект"
+	sql="SELECT ID,projectName FROM METADATA.Project WHERE %ALPHAUP(projectName) %STARTSWITH %ALPHAUP(?) ORDER BY projectName"
+	sqlLookup="SELECT projectName FROM METADATA.Project WHERE ID=?"
+	displayColumns="2"
+	choiceColumn="2"
+	valueColumn="1"
+	maxRows="500"
+ 	hidden="true"
+	/>
+</hgroup>
+<checkbox id="serverProject" caption="Згенерувати серверний проект" value="0" hidden="true"/>
+<hgroup align="center">
+<button id="btnOK" caption="Так" 
+ controlStyle="width: 200px; height: 24px;" 
+   onclick="zenPage.onbtnOKClick();"/>
+<spacer width="100"/>
+<button id="btnExit" caption="Вихід" 
+ controlStyle="width: 200px; height: 24px;" 
+ onclick="this.directoryName='';zenPage.endModal();"
+/>
+</hgroup>
+</modalGroup>
+
+
+<!-- Окно настройки параметров студии-->
+<modalGroup id="propertyIDE" groupTitle="Налаштування" groupStyle="padding: 10px;">
+<fieldSet legend="WEB">
+<text label="IP WEB сервера:" id="hostIP" size="100" />
+<text label="Порт WEB сервера:" id="hostPort" size="100" />
+</fieldSet>
+<text label="Директорія бази даних:" id="mgrDir" size="100" />
+<text label="Директорія CSP файлів:" id="cspDir" size="100" />
+<text label="Директорія проектів:" id="projectDir" size="100" />
+<hgroup align="center">
+<button caption="Так" 
+ controlStyle="width: 200px; height: 24px;" 
+   onclick="zenPage.onClickPropertyIDE();"/>
+<spacer width="100"/>
+<button caption="Вихід" 
+ controlStyle="width: 200px; height: 24px;" 
+ onclick="zenPage.endModal();"
+/>
+</hgroup>
+</modalGroup>
+
+<!-- Окно сохранения нового файла-->
+<modalGroup id="newPage" groupTitle="Новий файл" groupStyle="padding: 10px;">
+<text label="Ім'я:" id="newNameFile" size="100" />
+<hgroup align="center">
+<button caption="Так" 
+ controlStyle="width: 200px; height: 24px;" 
+   onclick="zenPage.saveNewPage();"/>
+<spacer width="100"/>
+<button caption="Вихід" 
+ controlStyle="width: 200px; height: 24px;" 
+ onclick="zenPage.endModal();"
+/>
+</hgroup>
+</modalGroup>
+</page>
+]]></Data>
+</XData>
+
+<Method name="toggleSettings">
+<Description>
+Toggle display of menu box.</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	this.settingsExpanded = !this.settingsExpanded;
+	var span = self.document.getElementById('spanArrow');
+	if (!this.settingsExpanded) {
+		span.innerHTML = '&#187;';
+	}
+	else {
+		span.innerHTML = '&#171;';
+	}
+	this.adjustSizes();
+]]></Implementation>
+</Method>
+
+<Method name="propertySettings">
+<Description>
+Toggle display of property box.</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	this.propertyExpanded = !this.propertyExpanded;
+	var span = self.document.getElementById('spanArrow1');
+	if (!this.propertyExpanded) {
+		span.innerHTML = '&#171;';
+	}
+	else {
+		span.innerHTML = '&#187;';
+	}
+	this.propertyAdjustSizes();
+]]></Implementation>
+</Method>
+
+<Method name="propertyAdjustSizes">
+<Description>
+Adjust sizes of propertyPane on the page.</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	try {
+		var propDiv = zen('propertyPane').getEnclosingDiv();
+		var showPRG= zen('showPRG');
+		var tabTools= zen('tabTools').getEnclosingDiv();
+		
+		propDiv.style.display = 'block';
+		// find size of window
+		var winHeight = zenGetWindowHeight();
+		var winWidth = zenGetWindowWidth();
+
+		var propWidth = 40;
+		if (this.propertyExpanded) {
+			propWidth = (winWidth<900) ? 300 : 350;
+		}
+		var hgt = winHeight -100 ;
+		propDiv.style.width = propWidth+4 + 'px';
+		propDiv.style.height = hgt + 'px';
+		
+		tabTools.style.width = propWidth-1 + 'px';
+		tabTools.style.height = hgt-96 + 'px';
+		
+		//showPRG.setProperty('height',hgt-80 + 'px');
+		//showPRG.setProperty('width',winWidth-440+ 'px');
+		
+		var contentProperty = zen('contentProperty');
+		if (this.propertyExpanded) {
+			if (contentProperty) {
+				contentProperty.ieResizeBody = function() { return; };
+				contentProperty.setHidden(false);
+			}
+		}
+		else {
+			contentProperty.setHidden(true);
+		}
+	}
+	catch(ex) {
+		zenExceptionHandler(ex,arguments,'Error in adjustSizes');
+	}
+	this.pageContentSizes();
+]]></Implementation>
+</Method>
+
+<Method name="adjustSizes">
+<Description>
+Adjust sizes of menuPane on the page.</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	try {
+		var propDiv = zen('menuPane').getEnclosingDiv();
+		propDiv.style.display = 'block';
+		// find size of window
+		var winHeight = zenGetWindowHeight();
+		var winWidth = zenGetWindowWidth();
+
+		var propWidth = 40;
+		if (this.settingsExpanded) {
+			propWidth = (winWidth<900) ? 300 : 350;
+		}
+		var hgt = winHeight -100 ;
+		propDiv.style.width = propWidth+4 + 'px';
+		propDiv.style.height = hgt + 'px';
+		
+		var viewDiv = zen('view').getEnclosingDiv();
+		viewDiv.style.width = propWidth-1+ 'px';
+		viewDiv.style.height = hgt-145 + 'px';
+		if (this.settingsExpanded) {
+			var mainMenu = zen('mainMenu');
+			var viewFiles = zen('viewFiles');
+			if ((mainMenu)&&(view)) {
+				mainMenu.ieResizeBody = function() { return; };
+				mainMenu.setHidden(false);
+				viewFiles.ieResizeBody = function() { return; };
+				viewFiles.setHidden(false);								
+			}
+		}
+		else {
+			zen('mainMenu').setHidden(true);
+			zen('viewFiles').setHidden(true);
+		}
+	}
+	catch(ex) {
+		zenExceptionHandler(ex,arguments,'Error in adjustSizes');
+	}
+	this.pageContentSizes();
+]]></Implementation>
+</Method>
+
+<Method name="pageContentSizes">
+<Description>
+/</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var winHeight = zenGetWindowHeight();
+	var winWidth = zenGetWindowWidth();
+		
+	var pageContent= zen('pageContent');
+	//var desktop=zen('desktop');
+	var dgHTML=zen('dgHTML');
+	var dgJS=zen('dgJS');
+	var dgCSS=zen('dgCSS');
+	var dgVIEW=zen('dgVIEW');
+	var snapGrid=zen('snapGrid');
+	
+
+	var menuPane = zen('menuPane').getEnclosingDiv();
+	var propertyPane = zen('propertyPane').getEnclosingDiv();
+		
+	var menuPaneW=parseInt(menuPane.style.width);
+	var menuPaneH=parseInt(menuPane.style.height);
+	
+	var propertyPaneW=parseInt(propertyPane.style.width);
+	var propertyPaneH=parseInt(propertyPane.style.height);
+	
+	var pageContentW=parseInt(winWidth-menuPaneW-propertyPaneW)-18;
+	var pageContentH = winHeight -100 ;
+	
+	var windowW=parseInt(pageContentW/2);
+	var windowH=parseInt(pageContentH/2);
+	
+		
+	pageContent.getEnclosingDiv().style.width =pageContentW+ 'px';
+	pageContent.getEnclosingDiv().style.height = pageContentH + 'px';
+	
+	
+	/*desktop.getEnclosingDiv().style.width =pageContentW+ 'px';
+	desktop.getEnclosingDiv().style.height = pageContentH + 'px';
+	*/
+	
+	snapGrid.getEnclosingDiv().style.width =pageContentW+ 'px';
+	snapGrid.getEnclosingDiv().style.height = pageContentH-34 + 'px';
+	snapGrid.forceRefresh();
+]]></Implementation>
+</Method>
+
+<Method name="ExitSystem">
+<Description>
+Выход из системы</Description>
+<Final>1</Final>
+<FormalSpec>exitReason=0</FormalSpec>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	if ($d(%session)) {
+		k %session.Data
+		s %session.EndSession=1
+	}
+	&js<zenPage.gotoPage('WEB.Maim.cls');>
+]]></Implementation>
+</Method>
+
+<Method name="onloadHandler">
+<Description>
+This client event, if present, is fired when the page is loaded.</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	this.loadHandler();
+	this.adjustSizes();
+	this.propertyAdjustSizes();
+	
+	this.initCodeMirror();
+	
+	this.changeTypeFile('html');
+]]></Implementation>
+</Method>
+
+<Method name="initCodeMirror">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	//html
+	  window.editor = CodeMirror.fromTextArea(document.getElementById("codeHTML"), {
+        	mode:  "text/html",
+        	lineNumbers: true,
+        	viewportMargin: Infinity,
+        	styleActiveLine: false,
+        	lineWrapping: true, 
+       	matchTags: {bothTags: true},
+        	autoCloseBrackets: true,
+        	autoCloseTags: true,
+        	theme:'xq-light',
+        	styleSelectedText: true,
+        	extraKeys: { 
+        		"Ctrl-Space": function(cm) {CodeMirror.showHint(cm, CodeMirror.hint.html)},
+        		"Ctrl-S": function(cm) {zenPage.savePage();}
+        	},
+        	foldGutter: true,
+    		gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+        });
+        editor.foldCode(CodeMirror.Pos(13, 0));
+  	  editor.foldCode(CodeMirror.Pos(1, 0));
+      
+      //javascript
+	  window.editorJS = CodeMirror.fromTextArea(document.getElementById("codeJS"), {
+        	mode: "javascript",
+        	lineNumbers: true,
+        	viewportMargin: Infinity,
+        	styleActiveLine: false,
+        	lineWrapping: true, 
+        	matchTags: {bothTags: true},
+        	autoCloseBrackets: true,
+        	autoCloseTags: true,
+        	lint: false,
+        	theme:'xq-light',
+        	extraKeys: {
+	        	"Ctrl-Space": function(cm) {CodeMirror.showHint(cm, CodeMirror.hint.javascript)},
+	        	"Ctrl-S": function(cm) {zenPage.savePage();}
+	        	},
+	     foldGutter: {
+    			rangeFinder: new CodeMirror.fold.combine(CodeMirror.fold.brace, CodeMirror.fold.comment)
+    		},  
+    		gutters: ["CodeMirror-lint-markers","CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+        });
+       // editorJS.foldCode(CodeMirror.Pos(8, 0));
+        
+        //css
+	  window.editorCSS = CodeMirror.fromTextArea(document.getElementById("codeCSS"), {
+        	mode:  "css",
+        	lineNumbers: true,
+        	viewportMargin: Infinity,
+        	styleActiveLine: false,
+        	lineWrapping: true, 
+        	matchTags: {bothTags: true},
+        	autoCloseBrackets: true,
+        	autoCloseTags: true,
+        	gutters: ["CodeMirror-lint-markers"],
+        	lint: true,
+        	theme:'xq-light',
+        	extraKeys: {
+	        	"Ctrl-Space": function(cm) {CodeMirror.showHint(cm, CodeMirror.hint.css)},
+	        	"Ctrl-S": function(cm) {zenPage.savePage();}
+	        	},
+        	foldGutter: true,
+    		gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+        });
+]]></Implementation>
+</Method>
+
+<Method name="loadHandler">
+<Description>
+метод который будет выполняться при загрузке страницы вместо </Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+</Method>
+
+<Method name="showMgGroup">
+<Description>
+метод отображающий модальное окно</Description>
+<FormalSpec>groupID,width,height</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (!width) width = null;
+	if (!height) height = null;
+	var group=zen(groupID);
+	//group.show();
+	group.show('', 'dynamic', null, null, null, width, height);
+]]></Implementation>
+</Method>
+
+<Method name="onbtnOKClick">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+     var view = this.getComponentById('view');
+     var driveobjValue = zen("Lookin").getValue();
+     if ((window.param=='project')||(window.param=='folder')) zenPage.NewDirectory(window.param,zen('newName').getValue(),driveobjValue,zen('serverProject').getValue(),zen('templateProject').getValue(),zen('listProject').getValue());
+     if ((window.param=='file')) {
+		if (!zenPage.getNameProject()) return;
+	     zenPage.NewFile(zen('newName').getValue(), driveobjValue, zen('typeFile').getValue(), zen('listFile').getValue());
+     }
+	view.refreshContents(true);
+       zenPage.endModal();
+]]></Implementation>
+</Method>
+
+<Method name="changeTemplateProject">
+<Description>
+клик по чекбоксу для выбора шаблона проекта</Description>
+<FormalSpec>pChenge</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zen('listProject').setProperty('hidden',!pChenge);
+]]></Implementation>
+</Method>
+
+<Method name="changeTemplateFiles">
+<Description>
+изменение типа файла</Description>
+<FormalSpec>pChenge</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zen('listFile').setProperty('parameters',1,pChenge);
+]]></Implementation>
+</Method>
+
+<Method name="setTypeFilter">
+<FormalSpec>value</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('tblFile');
+	table.setFilterValue('fileType',value);
+	table.applyFilters();
+]]></Implementation>
+</Method>
+
+<Method name="SelectDrawCell">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pTable:%ZEN.Component.tablePane,pName:%String,pSeed:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s fileID = %query("ID")
+	s fileType ="" 
+	if %query("fileType")="html" s fileType ="1" 
+	if %query("fileType")="js" s fileType ="2" 
+	if %query("fileType")="css" s fileType ="3" 
+   &html<<a href="javascript:zenPage.insertCode(#(fileID)#, #(fileType)#);">
+   <div class="background-SelectTerr" align="center"
+   	   >
+	</div>
+   </a>
+  
+   >
+   
+   Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="getNameProject">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var driveobj = zen("Lookin");
+	if (driveobj.options[1]==undefined){
+		zenAlert('Відкрийте проект!');
+		return 0;
+	}
+	var projectFolder = driveobj.options[1].value;
+	var thisitem = projectFolder.split("\\");
+	var projectName=thisitem[thisitem.length-2];
+
+	return projectName;
+]]></Implementation>
+</Method>
+
+<Method name="switchNamespace">
+<Description>
+Show dialog to switch namespace</Description>
+<Language>javascript</Language>
+<ReturnType>%String</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zenLaunchPopupWindow('WEB.DIALOG.namespaceSelect.cls','switchNamespace','status,scrollbars,resizable=yes,width=500,height=300,location=no');
+]]></Implementation>
+</Method>
+
+<Method name="onPopupAction">
+<Description><![CDATA[
+Subclass need to include the case "switchNamespace" if it is enabling "Switch" next to namespace.<br>]]></Description>
+<FormalSpec>popupName,action,value</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (action != "ok") {
+		return false;
+	}	
+	switch(popupName) {
+	case 'switchNamespace':
+		zen('namespacesLabel').setValue(value);
+		zenPage.updateSCContent();
+	break;
+	}
+]]></Implementation>
+</Method>
+
+<Method name="reloadSM">
+<Description>
+Reload method</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var html = zen("htmlSMContent");
+	html.refreshContents();
+]]></Implementation>
+</Method>
+
+<Method name="newItemCL">
+<Description>
+New class</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	//zenPage.SetSessionData('fileID','');
+	zenPage.clickItemMenu('WEB.CardServerMethod.cls','cardFile',800,450);
+]]></Implementation>
+</Method>
+
+<Method name="reloadCL">
+<Description>
+Reload list classes</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var html = zen("htmlSCContent");
+	html.refreshContents();
+	zenPage.updateSMContent('');
+]]></Implementation>
+</Method>
+
+<Method name="changeTypeClass">
+<Description>
+Обработчик изменения типа класса</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.updateSCContent(); /// Перерисовываем таблицу доступных классов
+	zenPage.reloadCL();
+]]></Implementation>
+</Method>
+
+<Method name="updateSCContent">
+<Description>
+Given the newly seleted namespace, update the source control content</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var namespace=zen('namespacesLabel').getValue();
+	var typeclass=zen('typeClass').getValue();
+	var html = zen("htmlSCContent");
+	html.seed = namespace+'^'+typeclass;
+	html.refreshContents();
+]]></Implementation>
+</Method>
+
+<Method name="scChanged">
+<Description>
+Обработчик выбора класса в списке классов для выбранной области и выбранного типа класса </Description>
+<FormalSpec>scValue</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	document.getElementById('currentClass').innerHTML ='Вибраний клас: '+scValue;
+	zenPage.updateSMContent(scValue);
+]]></Implementation>
+</Method>
+
+<Method name="DrawSCContent">
+<Description>
+Draw html content for class for current or selected namespace.</Description>
+<FormalSpec>pNamespaceTypeClass</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s pNamespace=$p(pNamespaceTypeClass,"^",1)
+	s pTypeClass=$p(pNamespaceTypeClass,"^",2)
+	s syperClass=""
+	if pTypeClass="rest" s syperClass="%CSP.REST"
+	if pTypeClass="websocked" s syperClass="%CSP.WebSocket"
+	If pNamespace = "" Set pNamespace = $Namespace
+	Set tNone = $$$Text("NONE")
+	Set cmdDocumentation = $$$Text("Documentation")
+	Set linkDoc1 = $P(##class(%CSP.Page).Link("/csp/sys/exp/UtilExpClass.csp"),"$NAMESPACE",1)_"?$NAMESPACE="_pNamespace
+	Set (CurrentSource,tCurrentSource) = ##class(%Studio.SourceControl.Interface).SourceControlClassGet(pNamespace)
+	If CurrentSource = "" Set tCurrentSource = tNone
+	&html<<h3 id='currentClass'>#($$$Text("Вибраний клас:"))# &nbsp; </h3>>
+	&html<<p>#($$$Text("Виберіть клас із списку, що приведений нижче."))#</p>>
+	&html<<form id="SCForm" name="SCForm"><table class="DetailTable" border="1" cellpadding="2" cellspacing="0" >>
+	&html<<tr><th>#($$$Text("Назва класа"))#</th><th>#($$$Text("Опис"))#</th>>
+	&html<<tr><td class="DetailValue">
+	<input type="radio" id="Choices" name="Choices" value=""  onclick="javascript:zenPage.scChanged(this.value);">#(tNone)#</td><td class="DetailValue">&nbsp;</td></tr>>
+	If pNamespace '= $ZU(5) {
+		Set tOldNamespace = $ZU(5)
+		Set $Namespace = pNamespace	
+	}
+	s query="select ID, Name from %Dictionary.CompiledClass where Super [ '"_syperClass_"'"
+	s tRS=##class(%ResultSet).%New("%DynamicQuery:SQL")
+ 	s sc=tRS.Prepare(query)
+	Do tRS.Execute()
+	While tRS.Next() {
+		Set name = tRS.GetData(2)
+		Set linkDoc2 = linkDoc1_"&$ID1="_name
+		
+		&html<<tr><td nowrap class="DetailValue" ><input type="radio" name="Choices" value="#(name)#"  onclick="javascript:zenPage.scChanged(this.value);">#($ZCVT(name,"O","HTML"))#</td>>
+		&html<<td nowrap class="DetailValue" valign="bottom"><a href="#(linkDoc2)#" target="top">#($ZCVT(cmdDocumentation,"O","HTML"))#<a></td></tr>>
+	}
+	&html<</table></form>>
+
+	If $G(tOldNamespace) Set $Namespace = tOldNamespace
+	
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="updateSMContent">
+<FormalSpec>nameclass</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var namespace=zen('namespacesLabel').getValue();
+	var html = zen("htmlSMContent");
+	html.seed = namespace+'^'+nameclass;
+	html.refreshContents();
+]]></Implementation>
+</Method>
+
+<Method name="DrawSMContent">
+<Description>
+Draw html content for method for current or selected class.</Description>
+<FormalSpec>pNamespaceNameclass</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s pNamespace=$p(pNamespaceNameclass,"^",1)
+	s pNameclass=$p(pNamespaceNameclass,"^",2)
+	If pNamespace = "" Set pNamespace = $Namespace
+	&html<<p>#($$$Text("Виберіть метод із списку, що приведений нижче."))#</p>>
+	&html<<form id="SMForm" name="SMForm"><table class="DetailTable" border="1" cellpadding="2" cellspacing="0" >>
+	&html<<tr><th>#($$$Text(""))#</th><th>#($$$Text("Метод"))#</th><th>#($$$Text("Призначення"))#</th></tr>>
+	If pNamespace '= $ZU(5) {
+		Set tOldNamespace = $ZU(5)
+		Set $Namespace = pNamespace	
+	}
+	s queryM="select Name,Description  from %Dictionary.CompiledMethod where Runnable='1' and parent ='"_pNameclass_"'"
+	s tRSM=##class(%ResultSet).%New("%DynamicQuery:SQL")
+ 	s sc=tRSM.Prepare(queryM)
+	Do tRSM.Execute()
+	While tRSM.Next() {
+		Set name = tRSM.GetData(1)
+		Set description = tRSM.GetData(2)
+		
+		
+		&html<<tr><td nowrap class="DetailValue" valign="bottom"><a href="javascript:zenPage.insertCacheLink('#(pNamespace)#','#(pNameclass)#','#(name)#');" target="top" ><image src="images/16x16/add_cod.png"/> <a></td>
+		<td nowrap class="DetailValue" >#($ZCVT(name,"O","HTML"))#</td>>
+		
+		&html<<td nowrap class="DetailValue" >#($ZCVT(description,"O","HTML"))#</td></tr>>
+	}
+	&html<</table></form>>
+
+	If $G(tOldNamespace) Set $Namespace = tOldNamespace
+	
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="DrawFileContent">
+<Description>
+Draw html content for files.</Description>
+<FormalSpec>ptypeFile</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set tFile=$CASE(ptypeFile,"html":"1",
+								   "js":"2",
+								   "css":"3",
+								    :"-1")
+	
+	&html<<p>#($$$Text("Виберіть компонент із списку, що приведений нижче."))#</p>>
+	&html<<form id="SMForm" name="SMForm"><table class="DetailTable" border="1" cellpadding="2" cellspacing="0" >>
+	&html<<tr><th></th><th>#($$$Text("Назва"))#</th></tr>>
+	s queryF="SELECT ID,toolsFileName, fileType FROM METADATA.File where (projectID is null) and (fileType='"_ptypeFile_"')"
+	s tRSF=##class(%ResultSet).%New("%DynamicQuery:SQL")
+ 	s sc=tRSF.Prepare(queryF)
+	Do tRSF.Execute()
+	While tRSF.Next() {
+		Set fileID = tRSF.GetData(1)
+		Set name = tRSF.GetData(2)
+		
+		&html<<tr><td nowrap class="DetailValue" valign="bottom"><a href="javascript:zenPage.insertCode(#(fileID)#, #(tFile)#);" target="top"><image src="images/16x16/add_cod.png"/> <a></td>
+		<td nowrap class="DetailValue" >#($ZCVT(name,"O","HTML"))#</td></tr>>
+	}
+	&html<</table></form>>
+
+	
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="changeTypeFile">
+<FormalSpec>typeFile</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var typeFiles=zen('typeFiles').getValue();
+	var html = zen("htmlFileContent");
+	html.seed =typeFiles;
+	html.refreshContents();
+]]></Implementation>
+</Method>
+
+<Method name="afterDrag">
+<FormalSpec>listBox,dragData</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	alert(dragData);
+	/*
+	// override default behavior:
+	// if this is a drag and drop between the 2 list boxes,
+	// then remove the item from the drag source.
+	
+	// make sure target is a list box
+	if (dragData.targetComponent.isOfType('listBox')) {
+		// ignore drag onto ourselves
+		if (dragData.targetComponent != listBox) {
+			if (dragData.sourceItem >= 0) {
+				listBox.removeOption(dragData.sourceItem);
+				zenPage.updatePriorities();
+			}
+		}
+	}
+	*/
+]]></Implementation>
+</Method>
+
+<Method name="RULang">
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s %session.Language = "ru"
+	 d %session.Set("language","ru")
+	&js<window.location.reload();>
+]]></Implementation>
+</Method>
+
+<Method name="UALang">
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s %session.Language = "ua"
+	d %session.Set("language","ua")
+	&js<window.location.reload();>
+]]></Implementation>
+</Method>
+
+<Method name="GetSessionData">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>name:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[  q $Get(%session.Data(name),"")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

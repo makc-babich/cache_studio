@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.ListFile">
+<Super>WEB.Template.Object</Super>
+<TimeCreated>63119,74736.610582</TimeCreated>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля страницы.</Description>
+<Data><![CDATA[
+<style type="text/css">
+
+</style>
+]]></Data>
+</XData>
+
+<XData name="Contents">
+<Description>
+Этот XML блок описывает содержимое этой страницы.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<page  xmlns="http://www.intersystems.com/zen" width="100%" align="center" valign="top">
+<hgroup width="100%" >
+<hmenu id="menuF" width="100%" hidden="false">
+<menuItem            id ="menuInsertF" caption="Додати" 
+					onclick="zenPage.newItemF();"
+					help="Додати новий запис"
+					image="images/16x16/record_add.png"
+					/>
+<menuItem
+            	          id ="menuEditF" caption="Редагувати" 
+					onclick="zenPage.editItemF();"
+					help="Редагувати запис"
+					image="images/16x16/record_edit.png"
+					/>
+<menuItem            id ="menuDeleteF" caption="Вилучити" 
+					onclick="zenPage.deleteItemF();"
+					help="Вилучити запис"
+					image="images/16x16/record_delete.png"
+					/>
+</hmenu>
+<tableNavigator msgFirstPage="Перейти на першу сторінку" msgLastPage="Перейти на останню сторінку" msgNextPage="Наступна сторінка" msgPreviousPage="Попередня сторінка" tablePaneId="listFile" id="navigatorF" msgPage="Сторінка" msgOf="з" width="100%" align="right"/>
+</hgroup>
+<tablePane id="listFile" OnCreateResultSet="CreateRSFile"
+useKeys="true" 
+useSnapshot="true" 
+showZebra="true"
+showQuery="false"
+showFilters="true"
+showRowNumbers="true"
+showRowSelector="false"
+valueColumn="ID"
+pageSize="200"
+maxRows="5000" 
+headerLayout="headersOnTop"
+nowrap="false"
+fixedHeaders="false"
+>
+<column colName="ID" hidden="true"/>
+<column id="fileName" colName="fileName" header="Файл"  filterType="text" filterOp="UP[" hidden="false"/>
+<column id="toolsFileName" colName="toolsFileName" header="Ім'я файла для панелі інстументів"  filterType="text" filterOp="UP["/>
+<column id="fileType" colName="fileType" header="Тип файла"
+ filterType="custom"
+ filterOp="%STARTSWITH" 
+   OnDrawFilter="DrawTypeFilter" filterValue="html"/>
+</tablePane>
+
+</page>
+]]></Data>
+</XData>
+
+<Method name="DrawTypeFilter">
+<FormalSpec>pTable:%ZEN.Component.tablePane,pName:%String,pColInfo:%ZEN.Auxiliary.column</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#; Draw HTML to display as filter.
+	Set captions = $LB("htm","javascript","css")
+	Set values = $LB("html","js","css")
+
+	#; draw set of radio buttons
+	#; These have id values of the form #(pTable.%MakeId("filterN_"_pName))#
+	#; in order to cooperate with filter disabling
+	For n=1:1:$LL(values) {
+		Set tValue = $LG(values,n)
+		Set tCaption = $LG(captions,n)
+		&html< <input type="radio" id=#(pTable.%MakeId("filter"_n_"_"_pName))# name="titleFilter_#(pTable.index)#" #($S(pColInfo.filterValue=tValue:"checked",1:""))# onclick="zenPage.setTypeFilter('#(tValue)#');" >#(tCaption)#>
+	}
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="setTypeFilter">
+<FormalSpec>value</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('listFile');
+	table.setFilterValue('fileType',value);
+	table.applyFilters();
+]]></Implementation>
+</Method>
+
+<Method name="deleteItemF">
+<Description>
+Delete </Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('listFile');
+	var id = table.getValue();
+	if ('' == id) {
+		//alert('Виберіть запис для вилучення.');
+		alert(zenText('choseDel'));
+	}
+	//else if (confirm('Ви бажаєте вилучити запис?')) {
+	else if (confirm(zenText('qDel'))) {
+		zenPage.DeleteFile(id);
+		table.executeQuery();
+	}
+]]></Implementation>
+</Method>
+
+<Method name="editItemF">
+<Description>
+Edit</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('listFile');
+	var id = table.getValue();
+	if ('' == id) {
+		//alert('Виберіть запис для редагування.');
+		alert(zenText('choseEdit'));
+		return;
+	}
+	zenPage.SetSessionData('fileID',id);
+	zenPage.clickItemMenu('WEB.CardFile.cls','cardFile',1000,600);
+]]></Implementation>
+</Method>
+
+<Method name="newItemF">
+<Description>
+New</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.SetSessionData('fileID','');
+	zenPage.clickItemMenu('WEB.CardFile.cls','cardFile',1000,600);
+]]></Implementation>
+</Method>
+
+<Method name="DeleteFile">
+<Description>
+удаление файла</Description>
+<FormalSpec>fileID:%String</FormalSpec>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	d DeleteFile^sys(fileID)
+]]></Implementation>
+</Method>
+
+<Method name="CreateRSFile">
+<Description>
+Метод создания выборки из хранимого класса METADATA.File, для выбранного шаблона проекта</Description>
+<FormalSpec>*tSC:%Status,pInfo:%ZEN.Auxiliary.QueryInfo</FormalSpec>
+<ReturnType>%ResultSet</ReturnType>
+<Implementation><![CDATA[
+ Set tRS = ""
+ Set tSC = $$$OK
+ Set tWHERE = "projectID is null" 
+ If ($GET(pInfo.filters("fileName"))'="")
+{
+ Set tWHERE = tWHERE _ $SELECT(tWHERE="":"",1:" AND ") _
+ "%ALPHAUP(fileName)  [ %ALPHAUP('" _ pInfo.filters("fileName") _ "')"
+}
+ //
+ If ($GET(pInfo.filters("filePath"))'="")
+{
+ Set tWHERE = tWHERE _ $SELECT(tWHERE="":"",1:" AND ") _
+ "%ALPHAUP(toolsFileName)  [ %ALPHAUP('" _ pInfo.filters("toolsFileName") _ "')"
+}
+ //
+ If ($G(pInfo.filters("fileType"))'="") {
+		Set tWHERE = tWHERE _ $S(tWHERE="":"",1:" AND ") _ "fileType %STARTSWITH '" _ pInfo.filters("fileType") _ "'"
+	}
+ //
+ If ($G(pInfo.filters("toolsFileName"))'="") {
+		Set tWHERE = tWHERE _ $S(tWHERE="":"",1:" AND ") _ "toolsFileName [ '" _ pInfo.filters("toolsFileName") _ "'"
+	}
+ Set sql = "SELECT ID, toolsFileName,fileName,fileType FROM METADATA.File"
+ Set:tWHERE'="" sql = sql _ " WHERE " _tWHERE
+ Set sql = sql _ " ORDER BY  fileName"
+ Set tRS = ##class(%ResultSet).%New()
+ Set tSC = tRS.Prepare(sql)
+ Set pInfo.queryText = sql
+ Quit tRS
+]]></Implementation>
+</Method>
+
+<Method name="onPopupAction">
+<FormalSpec>popupName,action,value</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zen('listFile').executeQuery();
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.CardListProject">
+<Super>WEB.Template.Object</Super>
+<TimeCreated>63118,61587.643947</TimeCreated>
+
+<Property name="isNew">
+<Type>%Boolean</Type>
+<InitialExpression>1</InitialExpression>
+</Property>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля страницы.</Description>
+<Data><![CDATA[
+<style type="text/css">
+#menuInsert {
+	padding-left: 10px;
+}
+.background-SelectTerr { 
+	height:16px;
+	width:16px;
+	/*background: url(images/Select.png) no-repeat;*/
+   }
+
+</style>
+]]></Data>
+</XData>
+
+<XData name="Contents">
+<Description>
+Этот XML блок описывает содержимое этой страницы.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<page  xmlns="http://www.intersystems.com/zen" width="100%" align="center" valign="top">
+<vgroup  width="100%">
+<hgroup width="100%" >
+<hmenu id="menuP" width="100%" hidden="false">
+<menuItem            id ="menuInsert" caption="Додати" 
+					onclick="zenPage.newItem();"
+					help="Додати новий запис"
+					image="images/16x16/record_add.png"
+					/>
+<menuItem
+            	          id ="menuEdit" caption="Редагувати" 
+					onclick="zenPage.editItem();"
+					help="Редагувати запис"
+					image="images/16x16/record_edit.png"
+					/>
+<menuItem            id ="menuDelete" caption="Вилучити" 
+					onclick="zenPage.deleteItem();"
+					help="Вилучити запис"
+					image="images/16x16/record_delete.png"
+					/>
+</hmenu>
+<tableNavigator msgFirstPage="Перейти на першу сторінку" msgLastPage="Перейти на останню сторінку" msgNextPage="Наступна сторінка" msgPreviousPage="Попередня сторінка" tablePaneId="pickList" id="navigatorId" msgPage="Сторінка" msgOf="з" width="100%" align="right"/>
+</hgroup>
+
+<tablePane id="pickList" caption="Шаблони проектів" tableName="METADATA.Project"
+useKeys="true" 
+useSnapshot="true" 
+showZebra="true"
+showQuery="false"
+showFilters="true"
+showRowNumbers="false"
+showRowSelector="false"
+valueColumn="ID"
+pageSize="200"
+maxRows="5000" 
+headerLayout="headersOnTop"
+nowrap="false"
+fixedHeaders="false"
+onselectrow="zenPage.rowSelected(zenThis);">
+
+<column colName="ID" hidden="true"/>
+<column width="120" id="projectName" colName="projectName" header="Найменування проекту"  filterType="text" filterOp="UP["/>
+
+</tablePane>
+</vgroup>
+
+<spacer height="10"/>
+<hgroup align="right" hidden="true">
+  <button id="btnExit" caption="Вихід" onclick="zenPage.closeForm();"/>
+</hgroup>
+<vgroup>
+
+<modalGroup id="mgStatic">
+<dataController id="controller" modelClass="METADATA.Project" modelId="#(%page.objectID)#"/>
+ <form id="formModal" controllerId="controller" labelPosition="top" cellStyle="padding: 1px; color: white;">
+ <label id="lblMsg" width="100%" align="center"/>
+ <text label="Проект" dataBinding="projectName" size="100"/>
+</form>
+
+<!-- Табличная часть, отображающая перечень файлов в проекте -->
+<fieldSet legend="Файли"  width="100%">
+
+<vgroup  width="100%">
+<hgroup width="100%" >
+<hmenu id="menuF" width="100%" hidden="false">
+<menuItem            id ="menuInsertF" caption="Додати" 
+					onclick="zenPage.newItemF();"
+					help="Додати новий запис"
+					image="images/16x16/record_add.png"
+					/>
+<menuItem
+            	          id ="menuEditF" caption="Редагувати" 
+					onclick="zenPage.editItemF();"
+					help="Редагувати запис"
+					image="images/16x16/record_edit.png"
+					/>
+<menuItem            id ="menuDeleteF" caption="Вилучити" 
+					onclick="zenPage.deleteItemF();"
+					help="Вилучити запис"
+					image="images/16x16/record_delete.png"
+					/>
+</hmenu>
+<tableNavigator msgFirstPage="Перейти на першу сторінку" msgLastPage="Перейти на останню сторінку" msgNextPage="Наступна сторінка" msgPreviousPage="Попередня сторінка" tablePaneId="listFile" id="navigatorF" msgPage="Сторінка" msgOf="з" width="100%" align="right"/>
+</hgroup>
+<tablePane id="listFile" OnCreateResultSet="CreateRSFile"
+useKeys="true" 
+useSnapshot="true" 
+showZebra="true"
+showQuery="false"
+showFilters="true"
+showRowNumbers="true"
+showRowSelector="false"
+valueColumn="ID"
+pageSize="200"
+maxRows="5000" 
+headerLayout="headersOnTop"
+nowrap="false"
+fixedHeaders="false"
+>
+
+<column colName="ID" hidden="true"/>
+<column id="fileName" colName="fileName" header="Файл"  filterType="text" filterOp="UP["/>
+<column id="filePath" colName="filePath" header="Повний шлях до файлу"  filterType="text" filterOp="UP["/>
+
+</tablePane>
+</vgroup>
+</fieldSet>
+
+
+
+<hgroup id="btnGroup" align="right">
+  <button id="mgBtnOK" caption="Так " onclick="zenPage.saveItem();"/>
+  <spacer width="10" />
+  <button id="mgBtnExit" caption="Вихід" onclick="zenPage.closeModalForm();" />
+</hgroup>
+</modalGroup>
+</vgroup>
+
+</page>
+]]></Data>
+</XData>
+
+<Method name="rowSelected">
+<Description><![CDATA[
+Row selected in pick list; update controller.
+<var>which</var> indicates how this event was fired.]]></Description>
+<FormalSpec>table</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var id = table.getValue();
+	var controller = zen('controller');
+	controller.setModelId(id);
+]]></Implementation>
+</Method>
+
+<Method name="newItem">
+<Description>
+Create a new item to edit.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var prg=zenPage.getProjectName();
+	if(prg==0) return 0;
+	var controller = zenPage.getComponentById('controller');
+	zenPage.SetSessionData('templateProjectID','');
+	controller.createNewObject();
+	var group = this.getComponentById('mgStatic');
+	this.showGroup(group);
+	zen('lblMsg').setProperty('label',zenText('MyId'));
+	zen('menuF').setProperty('hidden',true);
+]]></Implementation>
+</Method>
+
+<Method name="editItem">
+<Description>
+current edit.</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.isNew=0;
+	var table = zen('pickList');
+	var controller = zen('controller');
+	var id = table.getValue();
+	if ('' == id) {
+		alert(zenText('chose'));
+		return;
+	}
+	zenPage.SetSessionData('templateProjectID',id);
+	controller.setModelId(id);
+	var group = this.getComponentById('mgStatic');
+	this.showGroup(group);
+	zen('lblMsg').setProperty('label',zenText('MyId2'));
+	zen('menuF').setProperty('hidden',false);
+	zen('listFile').executeQuery();
+]]></Implementation>
+</Method>
+
+<Method name="deleteItem">
+<Description>
+Delete current item from database</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+
+	var controller = zen('controller');
+	var id = controller.getModelId();
+
+	if ('' == id) {
+		alert(zenText('choseDel'));
+	}
+	//else if (confirm('Ви бажаєте вилучити запис?')) {
+	else if (confirm(zenText('ques'))) {
+		
+		zenPage.DeleteTemplate(id);
+		controller.deleteId(id);
+		var table = zen('pickList');
+		table.executeQuery();
+	}
+]]></Implementation>
+</Method>
+
+<Method name="deleteItemF">
+<Description>
+*************** обработчики таблицы файлов***********************///
+Delete </Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('listFile');
+	var id = table.getValue();
+	if ('' == id) {
+		//alert('Виберіть запис для вилучення.');
+		alert(zenText('choseDel'));
+	}
+	//else if (confirm('Ви бажаєте вилучити запис?')) {
+	else if (confirm(zenText('ques'))) {
+		
+		zenPage.DeleteFile(id);
+		table.executeQuery();
+	}
+]]></Implementation>
+</Method>
+
+<Method name="editItemF">
+<Description>
+Edit</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('listFile');
+	var id = table.getValue();
+	if ('' == id) {
+		//alert('Виберіть запис для редагування.');
+		alert(zenText('chose'));
+		return;
+	}
+	zenPage.SetSessionData('fileID',id);
+	zenPage.clickItemMenu('WEB.CardFile.cls','cardFile',1000,600);
+]]></Implementation>
+</Method>
+
+<Method name="newItemF">
+<Description>
+New</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.SetSessionData('fileID','');
+	zenPage.clickItemMenu('WEB.CardFile.cls','cardFile',1000,600);
+]]></Implementation>
+</Method>
+
+<Method name="saveItem">
+<Description>
+***************************************************************///
+Save current item in database</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var form = zen('formModal');
+	form.save();
+	var id = zen('controller').getModelId();
+	if(zenPage.isNew){
+		var prg=zenPage.getProjectName();
+		zenPage.CreateNewTemplate(prg,id);
+	}
+	
+	this.closeModalForm() ;
+
+	
+	// refresh the table
+	var table = zen('pickList');
+	table.executeQuery();
+]]></Implementation>
+</Method>
+
+<Method name="getProjectName">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var driveobj = window.opener.zen("Lookin");
+	try{
+		var projectFolder = driveobj.options[1].value;
+		var thisitem = projectFolder.split("\\");
+		var nameProject=thisitem[thisitem.length-2];
+		return nameProject;
+	}
+	catch(er){
+		zenAlert('Відкрийте проект!');
+		return 0;
+		}
+]]></Implementation>
+</Method>
+
+<Method name="closeModalForm">
+<Description>
+Method for closed opening modal form</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zenPage.endModal();
+]]></Implementation>
+</Method>
+
+<Method name="layoutHandler">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('pickList');
+	this.setSizeBodyTlb('pickList');
+]]></Implementation>
+</Method>
+
+<Method name="CreateNewTemplate">
+<Description>
+создание нового шаблона проекта</Description>
+<FormalSpec>projectName:%String,projectID:%String</FormalSpec>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s projectDir=$g(^ide("config","projectDir"),"")
+	s fullPath=projectDir_projectName_"\"
+	d CreateNewTemplate^sys(fullPath,projectID)
+]]></Implementation>
+</Method>
+
+<Method name="DeleteTemplate">
+<Description>
+удаление существующего шаблона проекта</Description>
+<FormalSpec>projectID:%String</FormalSpec>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	d DeleteAllFiles^sys(projectID)
+]]></Implementation>
+</Method>
+
+<Method name="DeleteFile">
+<Description>
+удаление файла</Description>
+<FormalSpec>fileID:%String</FormalSpec>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	d DeleteFile^sys(fileID)
+]]></Implementation>
+</Method>
+
+<Method name="CreateRSFile">
+<Description>
+Метод создания выборки из хранимого класса METADATA.File, для выбранного шаблона проекта</Description>
+<FormalSpec>*tSC:%Status,pInfo:%ZEN.Auxiliary.QueryInfo</FormalSpec>
+<ReturnType>%ResultSet</ReturnType>
+<Implementation><![CDATA[
+ Set tRS = ""
+ Set tSC = $$$OK
+ Set templateProjectID = $Get(%session.Data("templateProjectID"),"")
+ Set tWHERE = "projectID->ID='"_templateProjectID_"'"
+ If ($GET(pInfo.filters("fileName"))'="")
+{
+ Set tWHERE = tWHERE _ $SELECT(tWHERE="":"",1:" AND ") _
+ "%ALPHAUP(fileName)  [ %ALPHAUP('" _ pInfo.filters("fileName") _ "')"
+}
+ //
+ If ($GET(pInfo.filters("filePath"))'="")
+{
+ Set tWHERE = tWHERE _ $SELECT(tWHERE="":"",1:" AND ") _
+ "%ALPHAUP(filePath)  [ %ALPHAUP('" _ pInfo.filters("filePath") _ "')"
+}
+ Set sql = "SELECT ID, fileName, filePath FROM METADATA.File"
+ Set:tWHERE'="" sql = sql _ " WHERE " _tWHERE
+ Set sql = sql _ " ORDER BY  fileName"
+ Set tRS = ##class(%ResultSet).%New()
+ Set tSC = tRS.Prepare(sql)
+ Set pInfo.queryText = sql
+ Quit tRS
+]]></Implementation>
+</Method>
+
+<Method name="onPopupAction">
+<Description><![CDATA[
+This client event, if present, is fired when a popup page has specified
+this component as its parent and fires an action.<br>
+<var>popupName</var> is the name of the popup window sending the action.<br>
+<var>action</var> is the name of the action.<br>
+<var>value</var> is the value associated with the action.<br>]]></Description>
+<FormalSpec>popupName,action,value</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zen('listFile').executeQuery();
+]]></Implementation>
+</Method>
+</Class>
+</Export>

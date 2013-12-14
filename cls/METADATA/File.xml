@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="METADATA.File">
+<Description>
+Класс файлов принадлежащих проекту</Description>
+<Super>%Persistent,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeCreated>63118,59027.504452</TimeCreated>
+
+<Property name="toolsFileName">
+<Description>
+Имя файла для отображения в панели инструментов</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="symbols">
+<Description>
+Символ для отображения в панели инструментов</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="fileName">
+<Description>
+Имя файла</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="fileType">
+<Description>
+Тип файла</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="fileData">
+<Description>
+Данные файла</Description>
+<Type>%GlobalCharacterStream</Type>
+</Property>
+
+<Property name="filePath">
+<Description>
+Путь к файлу в проекте</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Property name="projectID">
+<Description>
+Проект</Description>
+<Type>METADATA.Project</Type>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^METADATA.FileD</DataLocation>
+<DefaultData>FileDefaultData</DefaultData>
+<IdLocation>^METADATA.FileD</IdLocation>
+<IndexLocation>^METADATA.FileI</IndexLocation>
+<StreamLocation>^METADATA.FileS</StreamLocation>
+<ExtentSize>100000</ExtentSize>
+<Data name="FileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>fileName</Value>
+</Value>
+<Value name="3">
+<Value>fileData</Value>
+</Value>
+<Value name="4">
+<Value>fileType</Value>
+</Value>
+<Value name="5">
+<Value>projectID</Value>
+</Value>
+<Value name="6">
+<Value>filePath</Value>
+</Value>
+<Value name="7">
+<Value>toolsFileName</Value>
+</Value>
+<Value name="8">
+<Value>symbols</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

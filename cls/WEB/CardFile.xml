@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.CardFile">
+<Super>WEB.Template.Object</Super>
+<TimeCreated>63119,59754.057266</TimeCreated>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля страницы.
+/*#symbols body, td, th, p, div, span, input, textarea {*/</Description>
+<Data><![CDATA[
+<style type="text/css">
+input.comboboxInput {
+font-size: 20px;
+height: 20px;
+}
+
+
+td {
+font-family: tahoma,verdana,arial,sans-serif;
+font-size: 20px;
+}
+</style>
+]]></Data>
+</XData>
+
+<XData name="Contents">
+<Description>
+Этот XML блок описывает содержимое этой страницы.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<page  xmlns="http://www.intersystems.com/zen" width="100%" align="center" valign="top">
+
+<dataController id="controller" modelClass="METADATA.File" modelId="#(%page.objectID)#"/>
+ <form id="formModal" controllerId="controller" cellStyle="padding: 1px; color: white;">
+<hgroup labelPosition="left">
+<text id="fileName" label="Ім'я файла" size="100" valign="middle" dataBinding="fileName"/>
+<radioSet id="fileType" displayList="html,javascript,css" valueList="html,js,css" value="html"  valign="middle" dataBinding="fileType"/>
+</hgroup>
+<hgroup labelPosition="left" valign="middle">
+<text id="toolsFileName" label="Ім'я файла для панелі інстументів" size="50"  dataBinding="toolsFileName"/>
+<combobox id="symbols" label="Символ для відображення в панелі інструментів" size="1" dataBinding="symbols" hidden="true">
+<option text="&#9109;" value="&#9109;"/>
+<option text="&#9027;" value="&#9027;"/>
+<option text="&#9028;" value="&#9028;"/>
+<option text="&#9031;" value="&#9031;"/>
+<option text="&#9032;" value="&#9032;"/>
+<option text="&#9040;" value="&#9040;"/>
+<option text="&#9047;" value="&#9047;"/>
+<option text="&#9036;" value="&#9036;"/>
+<option text="&#9043;" value="&#9043;"/>
+<option text="&#9037;" value="&#9037;"/>
+<option text="&#9044;" value="&#9044;"/>
+<option text="&#9016;" value="&#9016;"/>
+<option text="&#9017;" value="&#9017;"/>
+<option text="&#9018;" value="&#9018;"/>
+<option text="&#9019;" value="&#9019;"/>
+<option text="&#9020;" value="&#9020;"/>
+<option text="&#9071;" value="&#9071;"/>
+<option text="&#9072;" value="&#9072;"/>
+<option text="&#9025;" value="&#9025;"/>
+<option text="&#9026;" value="&#9026;"/>
+<option text="&#9054;" value="&#9054;"/>
+<option text="&#9056;" value="&#9056;"/>
+
+</combobox>
+</hgroup>
+</form>
+
+<html>
+<textarea id="code"  name="code" >
+</textarea>
+</html>
+<spacer height="10"/>
+<hgroup align="right">
+  <button id="btnOk" caption="Так " onclick="zenPage.save();"/>
+  <button id="btnExit" caption="Вихід" onclick="zenPage.closeForm();"/>
+</hgroup>
+</page>
+]]></Data>
+</XData>
+
+<Method name="closeForm">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (zenPage.isPopup){this.firePopupAction('valueItem');}
+ 	else{self.close();}
+]]></Implementation>
+</Method>
+
+<Method name="save">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var fileNameValue=zen('fileName').getValue().replace(/\.[^.]*$/,"");
+	var fileTypeValue=zen('fileType').getValue();
+	var controller=zen('controller');
+	var newFileName=fileNameValue+'.'+fileTypeValue
+	controller.setDataByName('fileName',newFileName);
+	controller.save();
+	var id = controller.getModelId();
+	var editor=window.editorFile;
+	var editorValue=editor.getValue();
+	zenPage.SetFileData(id,editorValue);
+]]></Implementation>
+</Method>
+
+<Method name="initCodeMirror">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	  window.editorFile = CodeMirror.fromTextArea(document.getElementById("code"), {
+        	mode:  "text/html",
+        	lineNumbers: true,
+        	viewportMargin: Infinity,
+        	styleActiveLine: false,
+        	lineWrapping: true, 
+       	matchTags: {bothTags: true},
+        	autoCloseBrackets: true,
+        	autoCloseTags: true,
+        	theme:'solarized light',
+        	styleSelectedText: true,
+        	extraKeys: { 
+        		"Ctrl-Space": function(cm) {CodeMirror.showHint(cm, CodeMirror.hint.html)},
+        		"Ctrl-S": function(cm) {zenPage.savePage();}
+        	},
+        	foldGutter: true,
+    		gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+        });
+        editorFile.foldCode(CodeMirror.Pos(13, 0));
+]]></Implementation>
+</Method>
+
+<Method name="onloadHandler">
+<Description>
+This client event, if present, is fired when the page is loaded.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.initCodeMirror();
+	var controller = zen('controller');
+	var id=zenPage.GetSessionData('fileID');
+	controller.setModelId(id);
+	if(id!=''){
+		var fileType=controller.getDataByName('fileType');
+		var data=zenPage.GetFileData(id);
+		var editor=window.editorFile;
+		var mode='text/html';
+		if (fileType=='js') mode='javascript';
+		if (fileType=='css') mode='css';
+		editor.setOption("mode", mode);
+   		CodeMirror.autoLoadMode(editor,mode);
+		editor.setValue(data);
+	}
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.DIALOG.namespaceSelect">
+<Super>%ZEN.Dialog.standardDialog</Super>
+<TimeCreated>63124,51681.396176</TimeCreated>
+
+<Parameter name="DOMAIN">
+<Default>%ZEN</Default>
+</Parameter>
+
+<Parameter name="APPLYBUTTON">
+<Description>
+No Apply button.</Description>
+<Default>0</Default>
+</Parameter>
+
+<Parameter name="RESOURCE">
+<Description>
+User must hold at least operator privilege to use this dialog.
+!!! this list should be longer</Description>
+<Default>%Admin_Operate,%Development,%Service_SQL,%Ens_Portal,%DeepSee_Architect,%DeepSee_Analyzer,%DeepSee_Portal,%DeepSee_Admin</Default>
+</Parameter>
+
+<Property name="CurrNamespace">
+<Description>
+Pass in current namespace.</Description>
+<Type>%String</Type>
+<Parameter name="ZENURL" value="CURRNS"/>
+</Property>
+
+<XData name="Style">
+<Data><![CDATA[
+<style type="text/css">
+
+/* @doc="Wrapper for listBox." */
+.listBox {
+	font-family: arial;
+	font-size: 10pt;
+	color: #404040;
+	background: white;
+	border: 1px #808080 solid;
+}
+
+/* @doc="Item within listBox." */
+.listBoxItem {
+	white-space: nowrap;
+	width: 100%;
+	color: #404040;
+	/* ie does not handle transparent */
+	border: 1px solid white;
+	cursor: pointer;
+	padding: 1px;
+}
+
+/* @doc="Selected item within listBox." */
+.listBoxItemSelected {
+	white-space: nowrap;
+	width: 100%;
+	color: black;
+	background: #E0E0FF;
+	font-weight: bold;
+	border: 1px dotted #202060;
+	cursor: pointer;
+	padding: 1px;
+}
+
+/* @doc="Selected item with focus within listBox." */
+.listBoxItemFocus {
+	white-space: nowrap;
+	width: 100%;
+	font-weight: bold;
+	color: white;
+	background: rgb(53,107,141);
+	background-image: none;
+	border: 1px solid #F0F0F0;
+	cursor: pointer;
+	padding: 1px;
+}
+
+#desc {
+	font-size: 10pt;
+	color: #606060;
+}
+/* command button styles */
+#btnOK input,
+#btnApply input,
+#btnCancel input,
+.commandButton {
+	background: rgb(156,154,141);
+border: 1px solid grey;
+color: #000000;
+padding: 4px;
+padding-top: 1px;
+padding-bottom: 1px;
+}
+
+.commandButtonRemove {
+	background: rgb(141,53,53);
+	color: #E0E0E0;
+	text-decoration: none;
+	padding: 3px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-radius: 5px;
+ 	border-top: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-right: 2px solid gray;
+    border-bottom: 2px solid gray;
+}
+
+.commandButtonDisabled {
+	background: darkgray;
+	color: #545454;
+	text-decoration: none;
+	padding: 3px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-radius: 5px;
+	border-top: 1px solid lightgray;
+	border-left: 1px solid lightgray;
+	border-right: 2px solid gray;
+	border-bottom: 2px solid gray;
+}
+
+#btnOK input:hover,
+#btnApply input:hover,
+#btnCancel input:hover,
+.commandButton:hover {
+	background: rgb(53,107,141);
+	color: white;
+	background-image: url(portal/button_hover.png);
+	background-repeat: repeat-x;
+}
+
+.commandButtonRemove:hover {
+	background: rgb(141,53,53);
+	color: white;
+	background-image: url(portal/button_red_hover.png);
+	background-repeat: repeat-x;
+}
+
+</style>
+]]></Data>
+</XData>
+
+<XData name="Contents">
+<Description>
+Contents of this page:</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<page xmlns="http://www.intersystems.com/zen" width="100%" height="100%" 
+	title="">
+
+<pane paneName="dialogBody" id="body" />
+<hgroup id="footer" width="100%" cellAlign="right">
+<hgroup id="buttonHolder" cellAlign="right">
+<button id="btnApply" hidden="#(%page.hideApplyButton)#" caption="Apply" onclick="zenPage.dialogApply();" />
+<spacer width="5" />
+<button id="btnOK" caption=" Так " onclick="zenPage.dialogFinish();" />
+<spacer width="5" />
+<button id="btnCancel" hidden="#(%page.hideCancelButton)#" caption="Вихід" onclick="zenPage.dialogCancel();" />
+<spacer width="10" />
+</hgroup>
+</hgroup>
+</page>
+]]></Data>
+</XData>
+
+<XData name="dialogBody">
+<Description>
+Contents of the dialog.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<pane xmlns="http://www.intersystems.com/zen">
+<vgroup labelPosition="top" cellStyle="padding:5px;">
+<listBox id="lstBox" onkeydown="return zenPage.listKeyDown(evt);"
+	label="Доступний список областей" listWidth="478px" listHeight="200px" ondblclick="zenPage.dialogFinish();">
+</listBox>
+<html id="desc" OnDrawContent="%GetDescHTML"/>
+</vgroup>
+</pane>
+]]></Data>
+</XData>
+
+<Method name="%GetDescHTML">
+<Description>
+Provide contents of description component.</Description>
+<FormalSpec>pSeed:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Write $$$TextHTML("")
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="%OnGetTitle">
+<Description>
+Get the (localized) title string for the dialog.
+This should be implemented in a subclass.</Description>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	Quit $$$TextHTML("Namespace Chooser")
+]]></Implementation>
+</Method>
+
+<Method name="%OnGetSubtitle">
+<Description>
+Get the (localized) subtitle string for the dialog.
+This should be implemented in a subclass.</Description>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	Quit $$$TextHTML("Select a namespace")
+]]></Implementation>
+</Method>
+
+<Method name="ondialogFinish">
+<Description>
+User clicked Finish. Attampt change namespace. If fails, display error message and do not leave dialog.</Description>
+<Language>javascript</Language>
+<ReturnType>%Boolean</ReturnType>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	try {
+		var val = zen("lstBox").getValue();
+		var canSwitchTo = this.ChangeNS(val);
+		if (canSwitchTo == 1) return true;
+		else alert(canSwitchTo);
+	}
+	catch(ex) {
+		zenExceptionHandler(ex,arguments);
+	}
+	return false;
+]]></Implementation>
+</Method>
+
+<Method name="getDialogValue">
+<Description>
+Return the value that should be returned by this dialog.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var val = zen("lstBox").getValue();	
+	return encodeURIComponent(val);
+]]></Implementation>
+</Method>
+
+<Method name="%OnAfterCreatePage">
+<Description><![CDATA[
+This callback is called after the server-side page 
+object and all of its children are created.<br/>
+Subclasses can override this to add, remove, or modify 
+items within the page object model, or to provide values
+for controls.]]></Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set tCombo = ..%GetComponentById("lstBox")
+	Set tSC = ##class(%CSP.Portal.Utils).%GetNamespaceList(.NspList)
+	If $$$ISERR(tSC) Quit tSC
+	Set tNamespace = $O(NspList(""))
+	Set tDisabled = ""
+	While tNamespace '= "" {
+		Set tEnabled = $lg(NspList(tNamespace),1)
+		If tEnabled = 1 {
+			#;YSD2618 If $system.CSP.GetDefaultApp(tNamespace) '= "" {
+			If $system.CSP.GetPortalApp(tNamespace,"%ZEN.Dialog.namespaceSelect.cls") '= "" {	
+				Set tOption = ##class(%ZEN.Auxiliary.option).%New()
+				Do tCombo.options.Insert(tOption)
+				Do ..%AddComponent(tOption)
+				Set tOption.text = tNamespace
+				Set tOption.value = tNamespace
+			}
+		} Else {
+			Set tDisabled = tDisabled _ $S(tDisabled'="":", ",1:"")_tNamespace
+		}
+		Set tNamespace = $O(NspList(tNamespace))
+	}
+
+	Set:..CurrNamespace="" ..CurrNamespace = $ZU(5)
+	Set tCombo.value = ..CurrNamespace
+	
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="adjustSize">
+<Description>
+Adjust size and position of components on this page.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	this.invokeSuper('adjustSize',arguments);
+
+	var body = zenPage.getComponentById('body');
+	var list = zenPage.getComponentById('lstBox');
+	var desc = zenPage.getComponentById('desc');
+
+	var bw = body.getEnclosingDiv().offsetWidth;
+	var bh = body.getEnclosingDiv().offsetHeight - desc.getEnclosingDiv().offsetHeight;
+
+	list.setProperty('listWidth', bw - 40);
+	list.setProperty('listHeight', bh - 60);
+]]></Implementation>
+</Method>
+
+<Method name="ondialogStart">
+<Description>
+This callback, if defined, is called when the dialog page is loaded.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var list = zenPage.getComponentById('lstBox');
+	list.focus();
+]]></Implementation>
+</Method>
+
+<Method name="listKeyDown">
+<Description>
+Key handler for list box.</Description>
+<FormalSpec>evt</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	switch(evt.keyCode) {
+	case zenENTER:
+		this.dialogFinish();
+		break;
+	case zenESC:
+		this.dialogCancel();
+		break;
+	}
+	return true;
+]]></Implementation>
+</Method>
+
+<Method name="ChangeNS">
+<Description>
+Attempt to change namespace. If fails, then some thing unusual is there about this namespace.</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNS:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	Set tSC = $$$OK
+	Set tOldNS = $ZU(5)
+	Set $ZT = "Trap"
+	If tOldNS '= pNS {
+		#; Change namespace now
+		Set $namespace = pNS
+		#; This call returns 0 (success) or 453
+		Set tSC = ##class(%SQL.Manager.API).SetServerInitCode()
+		Set tSC = $S(tSC=0:$$$OK,1:$$$Text("Error in user initialization code."))
+	}
+	Quit tSC
+Trap
+	Set $ZT=""
+	Set $namespace = tOldNS
+	If $ZE [ "<PROTECT>" Quit $$$Text("Unable to switch to this namespace. Either the default database is not mounted, or you do not have permission to access it.","%Utility")
+	Quit $ZCVT($ZE,"O","JS")
+]]></Implementation>
+</Method>
+</Class>
+</Export>

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.Template.CRUD">
+<Description>
+Базовый класс для создания CRUD форм</Description>
+<Abstract>1</Abstract>
+<Super>WEB.Template.Object</Super>
+<TimeCreated>63118,61403.049929</TimeCreated>
+
+<Parameter name="LOOKUPTABLE">
+<Description>
+SQL name of table that provides contents of the lookup table.</Description>
+<Type>STRING</Type>
+</Parameter>
+
+<Parameter name="CAPTIONTABLE">
+<Description>
+caption of table</Description>
+<Type>STRING</Type>
+</Parameter>
+
+<Parameter name="LOOKUPCOLUMN1">
+<Description>
+SQL name of column 1 to display withn the lookup table.</Description>
+<Type>STRING</Type>
+<Default>-1</Default>
+</Parameter>
+
+<Parameter name="LOOKUPCOLUMN2">
+<Description>
+SQL name of column 2 to display withn the lookup table.</Description>
+<Type>STRING</Type>
+<Default>-1</Default>
+</Parameter>
+
+<Parameter name="LOOKUPCOLUMN3">
+<Description>
+SQL name of column 3 to display withn the lookup table.</Description>
+<Type>STRING</Type>
+<Default>-1</Default>
+</Parameter>
+
+<Parameter name="ORDERBYCOLUMN">
+<Description>
+SQL name of column for orderby.</Description>
+<Type>STRING</Type>
+</Parameter>
+
+<Parameter name="WHEREEXPRESSION">
+<Description>
+SQL name of where expression.</Description>
+<Type>STRING</Type>
+</Parameter>
+
+<Parameter name="TABLENAME">
+<Default>pickList</Default>
+</Parameter>
+
+<Property name="LookupTable">
+<Description>
+Holds the name of the lookup table.
+This should be the name of an SQL table.</Description>
+<Type>%String</Type>
+<InitialExpression>..#LOOKUPTABLE</InitialExpression>
+</Property>
+
+<Property name="LookupColumn1">
+<Description>
+Holds the name of the lookup column.
+This should be the name of a column within the lookup table.</Description>
+<Type>%String</Type>
+<InitialExpression>..#LOOKUPCOLUMN1</InitialExpression>
+</Property>
+
+<Property name="LookupColumn2">
+<Type>%String</Type>
+<InitialExpression>..#LOOKUPCOLUMN2</InitialExpression>
+</Property>
+
+<Property name="LookupColumn3">
+<Type>%String</Type>
+<InitialExpression>..#LOOKUPCOLUMN3</InitialExpression>
+</Property>
+
+<Property name="captionTable">
+<Type>%String</Type>
+<InitialExpression>..#CAPTIONTABLE</InitialExpression>
+</Property>
+
+<Property name="OrdeByColumn">
+<Type>%String</Type>
+<InitialExpression>..#ORDERBYCOLUMN</InitialExpression>
+</Property>
+
+<Property name="WhereExpression">
+<Type>%String</Type>
+<InitialExpression>..#WHEREEXPRESSION</InitialExpression>
+</Property>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля страницы.</Description>
+<Data><![CDATA[
+<style type="text/css">
+#menuInsert {
+	padding-left: 10px;
+}
+.background-SelectTerr { 
+	height:16px;
+	width:16px;
+	/*background: url(images/Select.png) no-repeat;*/
+   }
+
+</style>
+]]></Data>
+</XData>
+
+<XData name="Contents">
+<Description>
+Этот XML блок описывает содержимое этой страницы.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<page  xmlns="http://www.intersystems.com/zen" width="100%" align="center" valign="top">
+<vgroup  width="100%">
+<hgroup width="100%" >
+<hmenu id="menuAdd" width="100%" hidden="false">
+<menuItem            id ="menuInsert" caption="Додати" 
+					onclick="zenPage.newItem();"
+					help="Додати новий запис"
+					image="images/16x16/record_add.png"
+					/>
+<menuItem
+            	          id ="menuEdit" caption="Редагувати" 
+					onclick="zenPage.editItem();"
+					help="Редагувати запис"
+					image="images/16x16/record_edit.png"
+					/>
+<menuItem            id ="menuDelete" caption="Вилучити" 
+					onclick="zenPage.deleteItem();"
+					help="Вилучити запис"
+					image="images/16x16/record_delete.png"
+					/>
+</hmenu>
+<tableNavigator msgFirstPage="Перейти на першу сторінку" msgLastPage="Перейти на останню сторінку" msgNextPage="Наступна сторінка" msgPreviousPage="Попередня сторінка" tablePaneId="pickList" id="navigatorId" msgPage="Сторінка" msgOf="з" width="100%" align="right"/>
+</hgroup>
+
+<tablePane id="pickList" tableName="#(%page.LookupTable)#"
+useKeys="true" 
+useSnapshot="true" 
+showZebra="true"
+showQuery="false"
+showFilters="true"
+showRowNumbers="false"
+showRowSelector="false"
+valueColumn="ID"
+pageSize="200"
+maxRows="5000" 
+headerLayout="headersOnTop"
+nowrap="false"
+fixedHeaders="false"
+onselectrow="zenPage.rowSelected(zenThis);"
+whereClause="#(%page.WhereExpression)#" orderByClause="#(%page.OrdeByColumn)#" >
+
+<column colName="ID" hidden="true"/>
+<column width="120" id="displayColumn1" condition='..showColumn(1)=1'
+colName="#(%page.LookupColumn1)#" 
+ filterType="text" filterOp="UP["/>
+ <column id="displayColumn2" condition='..showColumn(2)=2'
+colName="#(%page.LookupColumn2)#" 
+ filterType="text" filterOp="UP["/>
+ <column id="displayColumn3" condition='..showColumn(3)=3'
+colName="#(%page.LookupColumn3)#" 
+ filterType="text" filterOp="UP["/>
+<!--
+<column linkCaption="Вибрати" link="javascript:zenPage.selectItem();"
+ cellTitle="Вибрати виділений запис" header="Вибір" hidden="true" />
+<column OnDrawCell="SelectDrawCell" link="javascript:zenPage.selectItem();" cellTitle="Вибрати виділений запис" header="Вибір"  width="10" />
+-->
+</tablePane>
+</vgroup>
+<spacer height="10"/>
+<hgroup align="right" hidden="true">
+  <button id="btnExit" caption="Вихід" onclick="zenPage.closeForm();"/>
+</hgroup>
+<vgroup>
+
+<modalGroup id="mgStatic">
+<dataController id="controller" modelClass="#(%page.modelClass)#" modelId="#(%page.objectID)#"/>
+ <dynaForm id="formModal" controllerId="controller" labelPosition="top" cellStyle="padding: 1px; color: white;">
+ <label id="lblMsg" width="100%" align="center"/>
+</dynaForm>
+<hgroup id="btnGroup" cellAlign="right">
+  <button id="mgBtnOK" caption="OK" onclick="zenPage.saveItem();"/>
+  <spacer width="10" />
+  <button id="mgBtnExit" caption="Вихід" onclick="zenPage.closeModalForm();" />
+</hgroup>
+</modalGroup>
+</vgroup>
+
+</page>
+]]></Data>
+</XData>
+
+<Method name="SelectDrawCell">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pTable:%ZEN.Component.tablePane,pName:%String,pSeed:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	
+   &html<<a href="javascript:zenPage.selectItem();">
+   <div class="background-SelectTerr" align="center"
+   	   >
+	</div>
+   </a>
+   >
+   
+   Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="rowSelected">
+<Description><![CDATA[
+Row selected in pick list; update controller.
+<var>which</var> indicates how this event was fired.]]></Description>
+<Final>1</Final>
+<FormalSpec>table</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var id = table.getValue();
+	var controller = zen('controller');
+	controller.setModelId(id);
+]]></Implementation>
+</Method>
+
+<Method name="newItem">
+<Description>
+Create a new item to edit.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var controller = zenPage.getComponentById('controller');
+	controller.createNewObject();
+	var group = this.getComponentById('mgStatic');
+	this.showGroup(group);
+]]></Implementation>
+</Method>
+
+<Method name="editItem">
+<Description>
+current edit.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('pickList');
+	var controller = zen('controller');
+	var id = table.getValue();
+	if ('' == id) {
+		//alert('Виберіть запис для редагування.');
+		alert(zenText('choseEdit'));
+		return;
+	}
+	controller.setModelId(id);
+	var group = this.getComponentById('mgStatic');
+	this.showGroup(group);
+]]></Implementation>
+</Method>
+
+<Method name="deleteItem">
+<Description>
+Delete current item from database</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var controller = zen('controller');
+	var id = controller.getModelId();
+
+	if ('' == id) {
+		//alert('Виберіть запис для вилучення.');
+		alert(zenText('choseDel'));
+	}
+	//else if (confirm('Ви бажаєте вилучити запис?')) {
+	else if (confirm(zenText('qDel'))) {
+		controller.deleteId(id);
+
+		var table = zen('pickList');
+		table.executeQuery();
+	}
+]]></Implementation>
+</Method>
+
+<Method name="saveItem">
+<Description>
+Save current item in database</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var form = zen('formModal');
+	form.save();
+	this.closeModalForm() ;
+	
+	// refresh the table
+	var table = zen('pickList');
+	table.executeQuery();
+]]></Implementation>
+</Method>
+
+<Method name="closeModalForm">
+<Description>
+Method for closed opening modal form</Description>
+<Final>1</Final>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zenPage.endModal();
+]]></Implementation>
+</Method>
+
+<Method name="layoutHandler">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var table = zen('pickList');
+	table.setProperty('caption',zenPage.captionTable);
+	this.setSizeBodyTlb('pickList');
+]]></Implementation>
+</Method>
+
+<Method name="selectItem">
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var controller = zen('controller');
+	if (zenPage.isPopup){this.firePopupAction('valueItem',controller.getModelId());}
+ 	else{self.close();}
+]]></Implementation>
+</Method>
+
+<Method name="showColumn">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>colNum:%Integer</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<Implementation><![CDATA[
+	s qParam=0
+	if (..#LOOKUPCOLUMN1'=-1)&&(colNum=1){q 1}
+	if (..#LOOKUPCOLUMN2'=-1)&&(colNum=2){q 2}
+	if (..#LOOKUPCOLUMN3'=-1)&&(colNum=3){q 3}
+
+	q qParam
+]]></Implementation>
+</Method>
+</Class>
+</Export>

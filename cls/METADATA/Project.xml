@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="METADATA.Project">
+<Description>
+Класс проектов</Description>
+<Super>%Persistent,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeCreated>63118,58745.385012</TimeCreated>
+
+<Property name="projectName">
+<Description>
+Имя проекта</Description>
+<Type>%String</Type>
+<Parameter name="ZENLABEL" value="Проект:"/>
+<Parameter name="ZENSIZE" value="100"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^METADATA.ProjectD</DataLocation>
+<DefaultData>ProjectDefaultData</DefaultData>
+<IdLocation>^METADATA.ProjectD</IdLocation>
+<IndexLocation>^METADATA.ProjectI</IndexLocation>
+<StreamLocation>^METADATA.ProjectS</StreamLocation>
+<ExtentSize>100000</ExtentSize>
+<Data name="ProjectDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>name</Value>
+</Value>
+<Value name="3">
+<Value>projectName</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

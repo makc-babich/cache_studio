@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="METADATA.ServerMethod">
+<Super>%Persistent,%XML.Adaptor,%ZEN.DataModel.Adaptor</Super>
+<TimeCreated>63124,48385.529729</TimeCreated>
+
+<Property name="namespaces">
+<Description>
+Имя области</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="methodName">
+<Description>
+Имя метода</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="methodType">
+<Description>
+Тип метода (1-REST, 2-WebSocket)</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="method">
+<Description>
+Метод (1-POST, 2-GET)</Description>
+<Type>%Boolean</Type>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^METADATA.ServerMethodD</DataLocation>
+<DefaultData>ServerMethodDefaultData</DefaultData>
+<IdLocation>^METADATA.ServerMethodD</IdLocation>
+<IndexLocation>^METADATA.ServerMethodI</IndexLocation>
+<StreamLocation>^METADATA.ServerMethodS</StreamLocation>
+<ExtentSize>100000</ExtentSize>
+<Data name="ServerMethodDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>methodName</Value>
+</Value>
+<Value name="3">
+<Value>methodType</Value>
+</Value>
+<Value name="4">
+<Value>method</Value>
+</Value>
+<Value name="5">
+<Value>namespaces</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

@@ -1,0 +1,1235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.Main">
+<Description>
+Главная форма приложения</Description>
+<Super>WEB.Template.AbstractMain</Super>
+<TimeCreated>63094,61956.804055</TimeCreated>
+
+<Property name="DirFile">
+<Description>
+Original Directory path and/or filename passed in. If null is passed in, then manager directory will be used.</Description>
+<Type>%ZEN.Datatype.string</Type>
+<Parameter name="ZENURL" value="Dir"/>
+</Property>
+
+<Property name="DefaultDirectory">
+<Description>
+Composed Default Directory path. After much checking, this is the final default directory that is used as default.</Description>
+<Type>%ZEN.Datatype.string</Type>
+</Property>
+
+<UDLText name="T">
+<Content><![CDATA[
+// Parameter CSSINCLUDES = {"ide.css"};
+
+]]></Content>
+</UDLText>
+
+<XData name="mainMenu">
+<Description>
+Этот XML блок описывает содержимое меню первого уровня.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<pane width="100%"  xmlns="http://www.intersystems.com/zen" xmlns:ext="http://www.intersystems.com/zen.ext" >
+
+</pane>
+]]></Data>
+</XData>
+
+<Method name="GetViewContents">
+<Description>
+Build file and directory list</Description>
+<FormalSpec><![CDATA[&pParms:%String,*pContents:%String,&pHeader:%String]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	Set pHeader(1) = $$$Text("Назва")
+	Set pHeader(2) = $$$Text("Тип")
+	Set pHeader(3) = $$$Text("Розмір")
+	Set pHeader(4) = $$$Text("Змінено")
+
+	Set CloseImage = ..%Link("images/16x16/folder.png")
+
+	Set FileImageHTML = ..%Link("images/16x16/text_xml.png")
+	Set FileImageJS = ..%Link("images/16x16/text_js.png")
+	Set FileImageCSS = ..%Link("images/16x16/text_css.png")
+	
+	
+	
+	Set FILEOBJ = ##class(%ResultSet).%New("%File:FileSet")
+	Set Dir = $G(pParms("Dir"))
+	;s ..DefaultDirectory="D:\Projects\"
+	s ..DefaultDirectory=$g(^ide("config","projectDir"),"")
+	
+	Set:Dir="" Dir = ..DefaultDirectory
+	#; Check if this directory exists. If not, then find one level above. If that doesn't exist then use $zu(12)
+	If Dir '= "",'##class(%File).DirectoryExists(Dir) {
+		Set tRS = ##class(%ResultSet).%New("%File:ParseDirectory")
+		Do tRS.Execute(Dir)
+		While tRS.Next() {
+			If ##class(%File).DirectoryExists(tRS.GetData(3)) Set lastexistingdir = tRS.GetData(3)
+		}
+		If $G(lastexistingdir)'="", lastexistingdir'= Dir Set Dir = lastexistingdir
+	}
+	
+	If Dir = "" Set Dir = ##class(%File).ManagerDirectory()
+	
+	Set wildcard = $G(%request.Data("wildcard",1))
+	If wildcard = "" Set wildcard = $G(pParms("wildcard"),"*")
+	If $$$isVMS,wildcard = "*" Set wildcard = "*.*"
+	Set showdirectoryonly = $G(%request.Data("showdirectoryonly",1))
+	If showdirectoryonly = "" Set showdirectoryonly = $G(pParms("showdirectoryonly"),0)
+	Set sortby = $G(pParms("sortby"),"Type")	// in this application "sortby" is always set to Type so that directories are shown on top
+	Set includedirs = 1							// in this application we always include directories
+	Set drive = ##class(%File).NormalizeDirectory(Dir)
+	Set tSC = FILEOBJ.%Execute(drive,wildcard,sortby,includedirs)
+	Set n = 0
+	Set tContinue = 1
+	While FILEOBJ.%Next()&(tContinue) {
+		#; A flag should be passed in to indicate whether we should show Files or just Directories
+		If showdirectoryonly = 1,FILEOBJ.Get("Type") '= "D" Set tContinue = 0
+		
+		If tContinue = 1 {
+			Set file = FILEOBJ.GetData(1)
+			Set type = FILEOBJ.Get("Type")
+			Set filename = FILEOBJ.Get("ItemName")
+			Set ext=$p(filename,".",$l(filename,"."))
+			set newType=$CASE(type,"D":"П","F":"С", :"close")
+			If type = "D" {
+				Set icon = CloseImage
+				Set file = ##class(%File).NormalizeDirectory(file)
+			} Else {
+				Set icon=$CASE(ext,
+								"html":FileImageHTML,
+								"js":FileImageJS,
+								"css":FileImageCSS,
+								:CloseImage)
+				
+			}
+			Set n = n + 1
+			#; caption, icon, type
+			Set pContents(n) = $LB(filename,file_"^"_type_"^"_filename,icon,newType,FILEOBJ.Get("Size"),FILEOBJ.Get("DateModified"))
+		}
+	}
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="loadHandler">
+<Description>
+метод выполняется во время загрузки страницы</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+		/// установка размеров меню
+		this.SetSizeLookoutMenu();
+]]></Implementation>
+</Method>
+
+<Method name="clickMenu">
+<Description>
+обработка выбора меню</Description>
+<FormalSpec>src</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+ if (src=='') return;
+ var frameWindow = zen('frameWindow').setProperty('src',src);
+]]></Implementation>
+</Method>
+
+<Method name="setSizeFrameWindow">
+<Description>
+установка размеров фрейма</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var menuMain = zen('mainMenuLevel1');
+	var divmenuMain = menuMain.getEnclosingDiv();
+
+	var winHeight = zenGetWindowHeight();
+
+	var hSZ = winHeight - (parseInt(divmenuMain.offsetHeight)) - 106;
+	var frameWindow=zen('frameWindow');
+	frameWindow.setProperty('height',hSZ);
+]]></Implementation>
+</Method>
+
+<Method name="SetSizeLookoutMenu">
+<Description>
+установка размеров меню</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var menu = zen('lookout');
+	if (menu==undefined) return;
+	var menuMain = zen('mainMenu');
+	var divmenuMain = menuMain.getEnclosingDiv();
+
+	// find height of window
+	var winHeight = zenGetWindowHeight();
+
+	// adjust size of menu
+	var hSZ = winHeight - (parseInt(divmenuMain.offsetHeight)) - 129;
+	menu.setSize(350,hSZ);
+]]></Implementation>
+</Method>
+
+<Method name="upOneLevel">
+<Description>
+up one level</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	try {
+		var viewobj = this.getComponentById("view");
+		var driveobj = zenPage.getComponentById("Lookin");
+		var drive = driveobj.getValue(); //this is the value in the Lookin drop-down
+		var len = driveobj.options.length;
+		var lastdrive = "";
+		var lastdriveindex = "";
+		var thisdrive = "";
+		for (var r = 0; r < len; r++) {
+			thisdrive = driveobj.options[r].value;
+			if (thisdrive == drive) {
+				break;
+			} else {
+				lastdriveindex = r;
+				lastdrive = thisdrive;
+			}
+		}
+		if (parseInt(lastdriveindex) > -1) {
+			//check if this is already at the top level
+			var istop = false;
+			//if (lastdrive==this.DefaultDirectory) istop = true;
+		    //if (this.isWINDOWS) istop = this.IsTopLevel(drive,lastdrive);
+			if (istop == false) {
+				driveobj.setValue(lastdrive);
+				viewobj.setProperty("parameters","Dir", lastdrive);
+				viewobj.refreshContents(true);
+				// If File is passed in, then add it to the directory selected.
+				if (this.isVMS) {
+					if (lastdrive.indexOf(":") == lastdrive.length-1) {
+						lastdrive = lastdrive + "[000000]";
+					}
+				}
+				if (this.FileName != "") {
+					lastdrive = lastdrive + this.FileName;
+				}
+				//this.getComponentById("FileName").setProperty("value",lastdrive);
+			}
+		}
+		return;
+	}
+	catch (ex) {
+		zenExceptionHandler(ex,arguments,'Error in upOneLevel');
+	}
+]]></Implementation>
+</Method>
+
+<Method name="itemClicked">
+<Description>
+User clicked an item. 
+We put it in the File name field. User can OK it or [Enter] to drill down.</Description>
+<FormalSpec>viewobj</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	// "d" is the value you currently clicked, it contains two piece delimited by "^":
+	// 1) the whole path and file name
+	// 2) the file type
+	var d = viewobj.getProperty('value');
+	var thisitem = d.split("^");
+	var tvalue = thisitem[0];
+	if (thisitem[1] == "D" && this.FileName != "") tvalue = tvalue + this.FileName;
+	///alert(tvalue);
+	///zenPage.getComponentById("FileName").setValue(tvalue);
+]]></Implementation>
+</Method>
+
+<Method name="itemSelected">
+<Description>
+User has selected a new item (double click).</Description>
+<FormalSpec>viewobj</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var driveobj = zenPage.getComponentById("Lookin");
+	var d = viewobj.getProperty('value'); //this is the value you currently clicked	
+	var thisitem = d.split("^");
+	var tvalue = thisitem[0];
+	var tname = thisitem[2];
+	if (thisitem[1] == "D") {
+		this.reloadLookin(driveobj,tvalue);
+	} else {
+		zenPage.openFile(tvalue,tname);
+	}
+]]></Implementation>
+</Method>
+
+<Method name="reloadLookin">
+<Description>
+перестраиваем дерево проектов</Description>
+<FormalSpec>driveobj,tvalue</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	driveobj.resetOptions();
+	zenPage.RebuildLookin(tvalue,"*");
+]]></Implementation>
+</Method>
+
+<Method name="RebuildLookin">
+<Description>
+Construct new directory given the Look in directory and selected directory from the middle frame</Description>
+<FormalSpec>Dir,wildcard</FormalSpec>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	Do ..BuildDrive(.drives, Dir, .lastexistingdir)
+
+	Set tCombo = %page.%GetComponentById("Lookin")
+	Set isDefDir=0
+	Set drivename = $O(drives(""))
+		While drivename '= "" {
+			if (drivename=..DefaultDirectory) {Set isDefDir=1}
+			if isDefDir {
+				Set tOption = ##class(%ZEN.Auxiliary.option).%New()
+				Do tCombo.options.Insert(tOption)
+				Do ..%AddComponent(tOption)
+				Set tOption.text = drivename
+				Set tOption.value = drivename
+				Set tOption.style = "font-size:12px;"
+			}
+			Set drivename = $O(drives(drivename))
+		}
+
+	#; Set "Look in" default
+	Set tDir = ##class(%File).NormalizeDirectory(Dir)
+	Set tCombo.value =  tDir
+	Set tCombo.originalValue =  tDir
+	#; Set "FileName" value, with the user entered Filename if it exists.
+	//Set %page.%GetComponentById("FileName").value = $S(%page.FileName="":tDir,1:##class(%File).NormalizeFilename(%page.FileName,tDir))
+	#; Refresh Content
+	&javascript<
+		var viewobj = zenPage.getComponentById("view");
+		viewobj.setProperty("parameters","Dir", "#($ZCVT(Dir,"O","JS"))#");
+		viewobj.setProperty("parameters","wildcard", "#($ZCVT(wildcard,"O","JS"))#");
+		viewobj.refreshContents();
+		function second_passed() {
+			var prj=zenPage.getNameProject();
+			//zen('namePRJ').setProperty('label','Вибраний проект: '+prj);
+			zen('namePRJ').setProperty('label',zenText('proj')+prj);
+			//zenPage.GetPRJConfig(prj);
+		}
+		window.setTimeout(second_passed, 3000)
+
+	>
+	
+	Quit
+]]></Implementation>
+</Method>
+
+<Method name="BuildDrive">
+<Description>
+Get drive list</Description>
+<FormalSpec>*drives:%String,drive:%String,*lastexistingdir:%String</FormalSpec>
+<Implementation><![CDATA[
+	Set lastexistingdir = drive
+		Set tRS = ##class(%ResultSet).%New("%File:ParseDirectory")
+		Do tRS.Execute(drive)
+		While tRS.Next() {
+			Set tName = tRS.GetData(1)
+			If tRS.GetData(2) = 1 Kill drives(##class(%File).NormalizeDirectory(tName))
+			If tRS.GetData(2) = 0 {
+				Set tDirectory = tRS.GetData(3)
+				If ##class(%File).DirectoryExists(tDirectory) {
+					 Set drives(tDirectory) = "",lastexistingdir = tDirectory
+				}
+			}
+		}
+]]></Implementation>
+</Method>
+
+<Method name="%OnAfterCreatePage">
+<Description><![CDATA[
+This callback is called after the server-side page 
+object and all of its children are created.<br>
+Subclasses can override this to add, remove, or modify 
+items within the page object model, or to provide values
+for controls.]]></Description>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s ..DefaultDirectory=$g(^ide("config","projectDir"),"") ;"D:\Projects\"
+	d ..RebuildLookin(..DefaultDirectory,"*")
+ Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetDirectory">
+<Description>
+Check if user entered directory exists. Return a valid directory.</Description>
+<FormalSpec>Dir:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	Quit ##class(%Library.File).GetDirectory(Dir,1)
+]]></Implementation>
+</Method>
+
+<Method name="changeDrive">
+<Description>
+User selected a different directory from "Lookin" drop-down. If FileName is available, add to the newly selected directory.</Description>
+<FormalSpec>thisobj</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var name = thisobj.getValue();
+	var view = this.getComponentById("view");
+	view.setProperty("parameters","Dir", name);
+	view.refreshContents(true);
+]]></Implementation>
+</Method>
+
+<Method name="newObject">
+<Description>
+Create new project
+param="project" - create new project(folder) in default directory
+param="folder"    - create new folder in project
+param="file"    - create new folder in project</Description>
+<FormalSpec>param</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.showMgGroup('nameObject');
+	var typeFolder=new Object();
+	window.param=param;
+	zen('newName').setValue('');
+	if(param=='project'){
+		window.serverProject=1;
+		zen('templateProject').setValue(0);
+		zen('serverProject').setValue(0);
+		
+		zen('templateProject').setProperty('hidden',false);
+		zen('serverProject').setProperty('hidden',false);
+		zen('listProject').setProperty('hidden',true);
+		
+		zen('typeFile').setProperty('hidden',true);
+		zen('listFile').setProperty('hidden',true);
+	}
+	//
+	if(param=='file'){
+		zen('typeFile').setProperty('hidden',false);
+		zen('listFile').setProperty('hidden',false);
+		zen('listFile').setProperty('value','','');
+		zen('typeFile').setValue('html');
+		
+		zen('templateProject').setProperty('hidden',true);
+		zen('serverProject').setProperty('hidden',true);
+		zen('listProject').setProperty('hidden',true);
+		
+		
+	}
+	//
+	if(param=='folder'){
+		zen('typeFile').setProperty('hidden',true);
+		zen('listFile').setProperty('hidden',true);
+		
+		zen('templateProject').setProperty('hidden',true);
+		zen('serverProject').setProperty('hidden',true);
+		zen('listProject').setProperty('hidden',true);
+		
+		
+	}
+]]></Implementation>
+</Method>
+
+<Method name="NewDirectory">
+<Description>
+Create new derictory
+param="project" - create new project(folder) in default directory
+param="folder"    - create new folder in project
+dirName-name folder
+dir- parent folder
+isTemplate - select temlate for project
+idTemplate - id templete</Description>
+<FormalSpec>param:%String,dirName:%String,dir:%String="",serverProject:%String="false",isTemplate:%String="",idTemplate:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	if ((param="project")&&(dirName'="")){
+		s dir=$g(^ide("config","projectDir"),"")
+		q:dir=""
+		d ##class(%Library.File).CreateNewDir(dir,dirName)
+		if (serverProject="true") {d newProject^sys(dirName)}
+		if (isTemplate="true")&&(idTemplate'=""){
+			d ApplayTemplate^sys(idTemplate,dirName)}
+		Quit ""
+	}
+	elseif ((param="folder")&&(dirName'="")&&(dir'="")){
+		Quit ##class(%Library.File).CreateNewDir(dir,dirName)
+	}
+]]></Implementation>
+</Method>
+
+<Method name="deleteObject">
+<Description>
+User has delete folder or page.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var viewobj=zen('view');
+	var d = viewobj.getProperty('value'); //this is the value you currently clicked	
+	var thisitem = d.split("^");
+	var tvalue = thisitem[0];
+	if (thisitem[1] == "D") {
+		this.RemoveDirectoryAll(tvalue);
+	} else {
+		this.RemoveFile(tvalue);
+	}
+	viewobj.refreshContents(true);
+]]></Implementation>
+</Method>
+
+<Method name="RemoveFile">
+<Description>
+Deletes the file filename. Returns true if it succeeds and false otherwise.
+filename-full file name</Description>
+<FormalSpec>filename:%String</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	Quit ##class(%Library.File).Delete(filename)
+]]></Implementation>
+</Method>
+
+<Method name="RemoveDirectoryAll">
+<Description>
+Remove directory pTarget. Returns true if it succeeds and false otherwise.
+pTarget-directory name</Description>
+<FormalSpec>pTarget:%String</FormalSpec>
+<ReturnType>%Integer</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[	Quit ##class(%Library.File).RemoveDirectoryTree(pTarget)
+]]></Implementation>
+</Method>
+
+<Method name="NewFile">
+<Description>
+Create new file</Description>
+<FormalSpec>fileName:%String,dir:%String,typeFile:%String,fileID:%String=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s file=##class(%File).%New(dir_fileName_"."_typeFile)
+	Do file.Open("WSN")
+	
+	s msg=""
+	s fileData=""
+	if fileID'=""{
+		d GetFileData^sys(fileID,.fileData)
+	}
+	if (""'=fileData){
+		d file.Write(fileData)
+	}else{
+		if (typeFile="html"){
+			s msg="<!doctype html>"_$Char(13,10)
+			s msg=msg_"<html>"_$Char(13,10)
+			s msg=msg_"<head>"_$Char(13,10)
+			s msg=msg_"<meta charset=""utf-8"">"_$Char(13,10)
+			s msg=msg_"<title> "_fileName_" </title>"_$Char(13,10)
+			s msg=msg_"</head>"_$Char(13,10)
+			s msg=msg_"<body>"_$Char(13,10)
+			//s msg=msg_"Порожній шаблон сторінки"_$Char(13,10)
+			s msg=msg_$$$Text("Порожній шаблон сторінки")_$Char(13,10)
+			s msg=msg_"</body>"_$Char(13,10)
+			s msg=msg_"<html>"_$Char(13,10)
+			s msg=msg_"</html>"_$Char(13,10)
+			d file.Write(msg)
+		}elseif (typeFile="js"){
+			s msg="//"_$$$Text("Файл створено ")_$zd($h,3)
+			d file.Write(msg)
+		}elseif (typeFile="css"){
+			s msg="/*"_$$$Text("Файл створено ")_$zd($h,3)_"*/"
+			Do file.Write(msg)
+		}
+	}
+	d file.Close()
+	q ""
+]]></Implementation>
+</Method>
+
+<Method name="openFile">
+<Description>
+метод открытия файла в редакторе кода</Description>
+<FormalSpec>pathPhile,fileName</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var p = fileName.split(".");
+	var ext=p[p.length-1]
+	var strExt ={};
+	strExt['html']=1;
+	strExt['js']=2;
+	strExt['css']=3;
+	 //({html:1,js:2,css:3});
+	//alert(strExt[ext]);
+	if ((ext==undefined)||(!strExt[ext])){
+		//alert('Файл неможливо відкрити!');
+		alert(zenText('cannotOp'));
+		return 0;
+	}
+	var fileContent=zenPage.GetFile(pathPhile);
+	var editor='';
+	switch (ext){
+		case 'html':
+			window.fileNameHTML=pathPhile;
+			editor= window.editor;
+			zen('dgHTML').setProperty('header','HTML     ('+fileName+')');
+		break
+		case 'js':
+			window.fileNameJS=pathPhile;
+			editor= window.editorJS;
+			zen('dgJS').setProperty('header','JS     ('+fileName+')');
+		break
+		case 'css':
+			window.fileNameCSS=pathPhile;
+			editor= window.editorCSS;
+			zen('dgCSS').setProperty('header','CSS     ('+fileName+')');
+		break
+	}
+		
+	editor.setValue(fileContent);
+]]></Implementation>
+</Method>
+
+<Method name="saveNewPage">
+<Description>
+сохранение  изменений в новом файле</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var projectName=zenPage.getNameProject();
+	if (!projectName) return;
+	
+	var projectsDir=zenPage.GetProjectsDir();
+	var projectDir=projectsDir+projectName+'\\';
+
+	var fileNameValue=zen('newNameFile').getValue();
+	if ((fileNameValue==undefined)||(fileNameValue=='')){
+		zenAlert("Введіть ім'я файла");
+		return;
+		}
+	var fileName=projectDir+'\\'+fileNameValue;
+	var editorHTML= window.editor;
+	var editorJS= window.editorJS;
+	var editorCSS= window.editorCSS;
+	
+	var editorValueHTML=editorHTML.getValue();
+	var editorValueJS=editorJS.getValue();
+	var editorValueCSS=editorCSS.getValue();
+
+	if((editorValueHTML!=undefined)&&(editorValueHTML!='')){
+		var fileNameFull=fileName+'.html';
+		zenPage.SetFile(fileNameFull,editorValueHTML);
+	}
+	
+	if((editorValueJS!=undefined)&&(editorValueJS!='')){
+		var fileNameFull=fileName+'.js';
+		zenPage.SetFile(fileNameFull,editorValueJS);
+	}
+	
+	if((editorValueCSS!=undefined)&&(editorValueCSS!='')){
+		var fileNameFull=fileName+'.css';
+		zenPage.SetFile(fileNameFull,editorValueCSS);
+	}
+	
+     var view = this.getComponentById('view').refreshContents(true);
+]]></Implementation>
+</Method>
+
+<Method name="savePage">
+<Description>
+сохранение  изменений в открытом ранне файле</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var projectName=zenPage.getNameProject();
+	if (!projectName) return;
+	
+	
+	var editorHTML= window.editor;
+	var editorJS= window.editorJS;
+	var editorCSS= window.editorCSS;
+	
+	var fileNameHTML=window.fileNameHTML;
+	var fileNameJS=window.fileNameJS;
+	var fileNameCSS=window.fileNameCSS;
+	
+	if(fileNameHTML!=undefined){
+		var editorValueHTML=editorHTML.getValue();
+		zenPage.SetFile(fileNameHTML,editorValueHTML);
+	}
+	else{
+		if((editorHTML.getValue()!=undefined)&&(editorHTML.getValue()!='')) zenPage.showMgGroup('newPage');
+	}
+	
+	if(fileNameJS!=undefined){
+		var editorValueJS=editorJS.getValue();
+		zenPage.SetFile(fileNameJS,editorValueJS);
+	}
+	else{
+		if((editorJS.getValue()!=undefined)&&(editorJS.getValue()!='')) zenPage.showMgGroup('newPage');
+	}
+	
+	if(fileNameCSS!=undefined){
+		var editorValueCSS=editorCSS.getValue();
+		zenPage.SetFile(fileNameCSS,editorValueCSS);
+	}
+	else{
+		if((editorCSS.getValue()!=undefined)&&(editorCSS.getValue()!='')) zenPage.showMgGroup('newPage');
+	}
+]]></Implementation>
+</Method>
+
+<Method name="GetFile">
+<FormalSpec>fileName:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s tOut=""
+	s file=##class(%File).%New(fileName)
+	d file.Open("RS")
+	while 'file.AtEnd {
+		s tOut = tOut _ file.ReadLine()_$c(10) }
+	q tOut
+]]></Implementation>
+</Method>
+
+<Method name="SetFile">
+<FormalSpec>fileName:%String,fileData:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	d ##class(%File).Delete(fileName)
+	s file=##class(%File).%New(fileName)
+	;Do file.Open("WSA")
+	Do file.Open("WSN")
+	Do file.Write(fileData)
+	d file.Close()
+	q ""
+]]></Implementation>
+</Method>
+
+<Method name="onClickPropertyIDE">
+<Description>
+обработчик сохранения настроек студии</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var mgrDir=zen('mgrDir').getValue();
+	var cspDir=zen('cspDir').getValue();
+	var projectDir=zen('projectDir').getValue();
+	var hostIP=zen('hostIP').getValue();
+	var hostPort=zen('hostPort').getValue();
+	zenPage.SetIDEConfig(mgrDir,cspDir,projectDir,hostIP,hostPort);
+]]></Implementation>
+</Method>
+
+<Method name="SetIDEConfig">
+<Description>
+серверный метод обработчика сохранения настроек студии</Description>
+<FormalSpec>mgrDir:%String,cspDir:%String,projectDir:%String,hostIP:%String,hostPort:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	d setIDEConfig^sys(mgrDir,cspDir,projectDir,hostIP,hostPort)
+	q ""
+]]></Implementation>
+</Method>
+
+<Method name="showIDEConfig">
+<Description>
+выводим на экран настройки студии</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	zenPage.GetIDEConfig();
+	zenPage.showMgGroup('propertyIDE');
+]]></Implementation>
+</Method>
+
+<Method name="GetIDEConfig">
+<Description>
+установка значений полям ввода</Description>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s mgrDir = %page.%GetComponentById("mgrDir")
+	s cspDir = %page.%GetComponentById("cspDir")
+	s projectDir = %page.%GetComponentById("projectDir")
+	s hostIP = %page.%GetComponentById("hostIP")
+	s hostPort = %page.%GetComponentById("hostPort")
+	s mgrDir.value=$g(^ide("config","mgrDir"),"")
+	s cspDir.value=$g(^ide("config","cspDir"),"")
+	s projectDir.value=$g(^ide("config","projectDir"),"")
+	s hostIP.value=$g(^ide("config","hostIP"),"")
+	s hostPort.value=$g(^ide("config","hostPort"),"")
+	q ""
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// Компиляция проекта
+ClientMethod compileProject() [ Language = javascript ]
+{
+	var d = zen('view').getProperty('value'); 
+	var thisitem = d.split("^");
+	var tvalue = thisitem[2];
+	//if (thisitem[1] == "D") {
+		var prj=this.getNameProject();
+		if(tvalue==undefined){
+			alert('Компіляція не можлива! Відкрийте проект.');
+			return;
+		}
+		zenPage.showProgressBar()
+		window.setTimeout(function(){zenPage.CompileProjectZ(prj); zenPage.hiddenProgressBar();}, 3000)
+		//this.CompileProjectZ(prj);
+		//zenPage.hiddenProgressBar();
+	
+	//}
+}
+
+Method CompileProjectZ(project As %String) [ ZenMethod ]
+{
+	s currNS=$NAMESPACE
+	s mgrDir=$g(^ide("config","mgrDir"),"")
+	q:mgrDir=""
+	s Directory=##class(%Library.File).DirectoryExists(mgrDir_project)
+ 	if (Directory=0){
+	 	&js<alert('Компіляція не можлива! Відсутня область #(project)#');>
+	 	q 
+ 	}
+	ZNSPACE project
+	j compileAll^%zewdAPI(project,"","csp")
+	ZNSPACE currNS
+		&js<alert('Компіляція проекту #(project)#, виконана успішно! ');>
+	q
+}
+
+/// Компиляция страницы
+ClientMethod compilePage() [ Language = javascript ]
+{
+	var d = zen('view').getProperty('value'); 
+	var thisitem = d.split("^");
+	var tvalue = thisitem[2];
+	if (thisitem[1] != "D") {
+		var prj=this.getNameProject();
+		if(tvalue==undefined){
+			alert('Компіляція не можлива! Відкрийте сторінку.');
+			return;
+		}
+		zenPage.showProgressBar()
+		zenPage.savePage();
+		window.setTimeout(function(){zenPage.CompilePageZ(prj,tvalue); zenPage.hiddenProgressBar();}, 3000)
+		//this.CompilePageZ(prj,tvalue);
+	}
+}
+
+Method CompilePageZ(project As %String, page As %String) [ ZenMethod ]
+{
+	s currNS=$NAMESPACE
+	s mgrDir=$g(^ide("config","mgrDir"),"")
+	q:mgrDir=""
+	s Directory=##class(%Library.File).DirectoryExists(mgrDir_project)
+ 	if (Directory=0){
+	 	&js<alert('Компіляція не можлива! Відсутня область #(project)#');>
+	 	q 
+ 	}
+	ZNSPACE project
+	j compilePage^%zewdAPI(project,page,"","csp")
+	ZNSPACE currNS
+		&js<alert('Компіляція сторінки #(page)#, виконана успішно! ');>
+	q
+}
+*/
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// установка значений полям ввода для настроек проекта
+Method GetPRJConfig(project As %String) As %String [ ZenMethod ]
+{
+	s currNS=$NAMESPACE
+	s vRootURL=""
+ 	s vapplicationRootPath=""
+ 	s voutputRootPath=""
+ 	s vjsScriptMode=""
+ 	s vjsScriptPath=""
+ 	s vjsScriptOutputPath=""
+ 	s vdefaultPage=""
+ 	if 1=##class(%SYS.Namespace).Exists(project) {
+		ZNSPACE project
+ 		s vRootURL=$g(^zewd("config","RootURL","csp"),"")
+ 		s vapplicationRootPath=$g(^zewd("config","applicationRootPath"),"")
+ 		s voutputRootPath=$g(^zewd("config","outputRootPath","csp"),"")
+ 		s vjsScriptMode=$g(^zewd("config","jsScriptPath","csp","mode"),"")
+ 		s vjsScriptPath=$g(^zewd("config","jsScriptPath","csp","path"),"")
+ 		s vjsScriptOutputPath=$g(^zewd("config","jsScriptPath","csp","outputPath"),"")
+ 		s vdefaultPage=$g(^zewd("config","defaultPage"),"")
+ 		 ZNSPACE currNS
+ 	}
+	s RootURL = %page.%GetComponentById("RootURL")
+	s applicationRootPath = %page.%GetComponentById("applicationRootPath")
+	s outputRootPath = %page.%GetComponentById("outputRootPath")
+	s jsScriptMode = %page.%GetComponentById("jsScriptMode")
+	s jsScriptPath = %page.%GetComponentById("jsScriptPath")
+	s jsScriptOutputPath = %page.%GetComponentById("jsScriptOutputPath")
+	s defaultPage = %page.%GetComponentById("defaultPage")
+
+	
+	s RootURL.value=vRootURL
+ 	s applicationRootPath.value=vapplicationRootPath
+ 	s outputRootPath.value=voutputRootPath
+ 	s jsScriptMode.value=vjsScriptMode
+ 	s jsScriptPath.value=vjsScriptPath
+ 	s jsScriptOutputPath.value=vjsScriptOutputPath
+ 	s defaultPage.value=vdefaultPage
+ 	
+	q ""
+}
+*/
+]]></Content>
+</UDLText>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// обработчик сохранения настроек проекта
+ClientMethod onClickPropertyPRJ() [ Language = javascript ]
+{
+	var project=this.getNameProject();
+	var rootURL=zen('RootURL').getValue();
+	var applicationRootPath=zen('applicationRootPath').getValue();
+	var outputRootPath=zen('outputRootPath').getValue();
+	var jsScriptMode=zen('jsScriptMode').getValue();
+	var jsScriptPath=zen('jsScriptPath').getValue();
+	var jsScriptOutputPath=zen('jsScriptOutputPath').getValue();
+	var defaultPage=zen('defaultPage').getValue();
+	zenPage.SetPRJConfig(project,rootURL,applicationRootPath,outputRootPath,jsScriptMode,jsScriptPath,jsScriptOutputPath,defaultPage);
+}
+*/
+]]></Content>
+</UDLText>
+
+<Method name="SetPRJConfig">
+<Description>
+серверный метод обработчика сохранения настроек студии</Description>
+<FormalSpec>project:%String,RootURL:%String,applicationRootPath:%String,outputRootPath:%String,jsScriptMode:%String,jsScriptPath:%String,jsScriptOutputPath:%String,defaultPage:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	d setProgectConfig^sys(project,RootURL,applicationRootPath,outputRootPath,jsScriptMode,jsScriptPath,jsScriptOutputPath,defaultPage)
+	q ""
+]]></Implementation>
+</Method>
+
+<UDLText name="T">
+<Content><![CDATA[
+/*
+/// обработчик предосмотра проекта
+ClientMethod showProject() [ Language = javascript ]
+{
+	var showPRG= zen('showPRG');
+	var project=this.getNameProject();
+	var url=zenPage.GetUrl(project);
+	showPRG.setProperty('src',url)
+}
+
+/// установка url для просмотра проекта
+Method GetUrl(project) As %String [ ZenMethod ]
+{
+	s url=""
+	s currNS=$NAMESPACE
+	s hostIP=$g(^ide("config","hostIP"),"")
+	s hostPort=$g(^ide("config","hostPort"),"")
+	s RootURL=""
+ 	s defaultPage=""
+ 	if 1=##class(%SYS.Namespace).Exists(project) {
+		ZNSPACE project
+ 		s RootURL=$g(^zewd("config","RootURL","csp"),"")
+ 		s defaultPage=$g(^zewd("config","defaultPage"),"")
+ 		 ZNSPACE currNS
+ 	}
+	s url="http://"_hostIP_":"_hostPort_RootURL_"/"_project_"/"_defaultPage
+	q url
+}
+*/
+]]></Content>
+</UDLText>
+
+<Method name="addFile">
+<FormalSpec>fileName:%Library.String,filePath:%Library.String</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var txtCtrl = zen('listOpenFileHidden');
+	txtCtrl.setValue(txtCtrl.getValue()+','+fileName+'%'+filePath);
+	zenPage.DrawSelectedItem(txtCtrl.getValue(),fileName);
+]]></Implementation>
+</Method>
+
+<Method name="DrawSelectedItem">
+<Description>
+Отрисовуем выбранные файлы</Description>
+<FormalSpec>str:%Library.String,pFileName:%Library.String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	s hlpClose = $$$Text("Закрити файл")
+	;s control = ..%GetComponentById("listOpenFile")
+	;d control.%RemoveChildren()
+	s listStr = $LISTFROMSTRING(str,",")
+	s ptr=0
+	s value=""
+	#Dim list As %Library.ArrayOfDataTypes = ##class(%Library.ArrayOfDataTypes).%New()
+	WHILE $LISTNEXT(listStr,ptr,value) {
+		if value'=""{
+			s fileName = $p(value,"%",1)
+			s filePath = $p(value,"%",2)
+			d list.SetAt(fileName_"%"_filePath,fileName)
+		} 
+	}
+	s tComp = ##class(%ZEN.Component.html).%New()
+	#Dim content As %Library.String = ""
+	s content = content_"<div class='ndWrapper'>"
+	s content = content_"<table border='0' width='100%' cellspacing='0' style='white-space:pre-line;' cellpadding='0'>"
+	s key = ""
+	s name =""
+	s value=list.GetNext(.key)
+	s content = content_"<tr>"
+	While (key'="")
+	{
+		s name =list.GetAt(key)
+		s path=$REPLACE($p(name,"%",2),"\","\\")
+		s closeName=$REPLACE(name,"\","\\")
+		//s ^dd(key) = name
+		if $p(name,"%",1)=pFileName{
+			s content = content_"<td style='font-size: 8pt;background: rgb(156,154,141); color:white;cursor:default;padding-bottom: 3px;width:75%;' onclick=""zenPage.openFile('"_path_"','"_$p(name,"%",1)_"');"">"_$p(name,"%",1)_"</td>"
+		}
+		else{
+			s content = content_"<td style='font-size: 8pt;cursor:default;padding-bottom: 3px;width:75%;' onclick=""zenPage.openFile('"_path_"','"_$p(name,"%",1)_"');"">"_$p(name,"%",1)_"</td>"
+		}
+		s content = content_"<td width='5%' style='padding-left:5px; padding-top:2px;'><a title='"_hlpClose_"' class='ndCloseIcon' href=""javascript:return;"" onclick=""zenPage.dropSelectedItem('"_closeName_"');""><image src='images\16x16\close_a_16.png'/></a></td>"
+		;s content = content_"<td style='font-size: 8pt;padding-bottom: 3px;width:75%;'>&nbsp;&nbsp;&nbsp;&nbsp;</td>"
+		s value = list.GetNext(.key)
+	}
+	s content = content_"</tr>"
+	s content = content_"</table>"
+	s content = content_"</div>"
+
+	Set tComp.content=content
+	;Do control.%AddChild(tComp)
+	
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="dropSelectedItem">
+<FormalSpec>fileName</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var reg = new RegExp(fileName,'g')
+	var reg2 = new RegExp(',,','g')
+	var componentTxt = zen('listOpenFileHidden');
+	var str = componentTxt.getValue();
+	componentTxt.setValue(zenPage.delSubStr(str,fileName));
+	componentTxt.setValue(componentTxt.getValue().replace(reg2,","));
+	str = componentTxt.getValue();
+	if (str.length<3) {componentTxt.setValue('')}
+	zenPage.DrawSelectedItem(componentTxt.getValue());
+	var editor= window.editor;
+	editor.setValue('');
+	return 0;
+]]></Implementation>
+</Method>
+
+<Method name="updatePreview">
+<Description>
+метод формирования предосмотра</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	
+	/*$('.button').click(function() {
+    $.ajax({
+        url: "",
+        context: document.body,
+        success: function(s,x){
+
+            $('html[manifest=saveappoffline.appcache]').attr('content', '');
+                $(this).html(s);
+        }
+    }); 
+});*/
+
+	 	
+	var previewFrame = document.getElementById('previewHTML').getElementsByTagName('iframe')[0];
+     var preview =  previewFrame.contentDocument|| previewFrame.contentWindow.document;
+     preview.open();
+     preview.write(window.editor.getValue());
+     preview.close();
+]]></Implementation>
+</Method>
+
+<Method name="insertCode">
+<Description>
+вставка кода в редактор
+fileType 1-"html", 2-"js", 3-"css"</Description>
+<FormalSpec>fileID,fileType</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var data=zenPage.GetFileData(fileID);
+	switch (fileType){
+		case 1:
+				var codeHTML= window.editor;
+				var pos=codeHTML.getCursor().line;
+				codeHTML.setLine(pos,data);
+		break
+		case 2:
+				var codeJS= window.editorJS;
+				var pos=codeJS.getCursor().line;
+				codeJS.setLine(pos,data);
+		break
+		case 3:
+				var codeCSS= window.editorCSS;
+				var pos=codeCSS.getCursor().line;
+				codeCSS.setLine(pos,data);
+		break
+	}
+]]></Implementation>
+</Method>
+
+<Method name="insertFileJS">
+<Description>
+вставка ссылки на javascript файл в html разметку</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var fileNameJS=window.fileNameJS;
+	var projectName=zenPage.getNameProject();
+	var projectsDir=zenPage.GetProjectsDir();
+	var  projectDir=projectsDir+projectName+'\\';
+	var p = projectsDir.split("\\");
+	var folderProject=p[p.length-2]
+	var srcJS=folderProject+'/'+projectName+'/'+fileNameJS.replace(projectDir,'').replace(/\\/g,'/');
+	var rel='<script src="'+srcJS+'"><\/script>';
+	var codeHTML= window.editor;
+	var pos=codeHTML.getCursor().line;
+	codeHTML.setLine(pos,rel);
+]]></Implementation>
+</Method>
+
+<Method name="insertFileCSS">
+<Description>
+вставка ссылки на CSS файл в html разметку</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var fileNameCSS=window.fileNameCSS;
+	var projectName=zenPage.getNameProject();
+	var projectsDir=zenPage.GetProjectsDir();
+	var  projectDir=projectsDir+projectName+'\\';
+	var p = projectsDir.split("\\");
+	var folderProject=p[p.length-2]
+	var hrefCSS=folderProject+'/'+projectName+'/'+fileNameCSS.replace(projectDir,'').replace(/\\/g,'/');
+	var rel='<link rel="stylesheet" href="'+hrefCSS+'">';
+	var codeHTML= window.editor;
+	var pos=codeHTML.getCursor().line;
+	codeHTML.setLine(pos,rel);
+]]></Implementation>
+</Method>
+
+<Method name="insertCacheLink">
+<Description>
+Вставка ссылки на класс
+nameClass-полное имя класса</Description>
+<FormalSpec>namespace,parentClass,name</FormalSpec>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var typeclass=zen('typeClass').getValue();
+	var hostIP=zenPage.GetHostIP();
+	var hostPort=zenPage.GetHostPort();
+	switch(typeclass) {
+	case 'rest':
+		var rel='http://'+hostIP+':'+hostPort+'/csp/'+namespace+'/'+name;
+		var codeJS= window.editorJS;
+		var pos=codeJS.getCursor().line;
+		codeJS.setLine(pos,rel);
+	break;
+	
+	case 'websocked':
+		var rel='ws://'+hostIP+':'+hostPort+'/csp/'+namespace+'/'+parentClass+'.cls';
+		var codeJS= window.editorJS;
+		var pos=codeJS.getCursor().line;
+		codeJS.setLine(pos,rel);
+
+	break;
+	
+	}
+]]></Implementation>
+</Method>
+
+<Method name="onlinkFile">
+<Description>
+Вставка ссылки на файл из списка файлов в проводнике</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	var driveobj = zenPage.getComponentById("Lookin");
+	var viewobj=zen('view');
+	var d = viewobj.getProperty('value'); 
+	var thisitem = d.split("^");
+	var tvalue = thisitem[0];
+	var tType = thisitem[1];
+	var fileName = thisitem[2];
+	
+	if (tType=='D') return 0;
+	
+	var projectName=zenPage.getNameProject();
+	var projectsDir=zenPage.GetProjectsDir();
+	var  projectDir=projectsDir+projectName+'\\';
+	var p = projectsDir.split("\\");
+	var folderProject=p[p.length-2]
+	var hrefFile=folderProject+'/'+projectName+'/'+tvalue.replace(projectDir,'').replace(/\\/g,'/');
+	
+	var p = fileName.split(".");
+	var ext=p[p.length-1]
+	if (ext==undefined){
+		//alert('Файл неможливо відкрити!');
+		alert(zenText('cannotOp'));
+		return 0;
+	}
+	
+	var rel='';
+
+	switch (ext){
+		case 'js':
+			var rel='<script src="'+hrefFile+'"><\/script>';
+		break
+		case 'css':
+			var rel='<link rel="stylesheet" href="'+hrefFile+'">';
+		break
+	}
+		
+	var codeHTML= window.editor;
+	var pos=codeHTML.getCursor().line;
+	codeHTML.setLine(pos,rel);
+]]></Implementation>
+</Method>
+</Class>
+</Export>

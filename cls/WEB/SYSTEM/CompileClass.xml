@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.SYSTEM.CompileClass">
+<Super>%CSP.Page</Super>
+<TimeCreated>63124,54764.284439</TimeCreated>
+
+<Method name="OnPage">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<ServerOnly>1</ServerOnly>
+<Implementation><![CDATA[
+	Set namespaces = $get(%request.Data("namespaces",1))
+	Set className = $get(%request.Data("className",1))
+	Set classType = $get(%request.Data("classType",1))
+	&html<<html>
+<head>
+<style type="text/css">
+body {
+	font-family: "courier new";
+	font-size: 0.8em;
+}
+.compilerOutput {
+	background: white;
+	margin: 0px;
+	padding: 4px;
+	white-space: pre-wrap;
+}
+</style>
+</head>
+<body>>
+	
+	
+	&html<<div class="compilerOutput">>
+	
+	if classType="rest" d GenREST^sys(namespaces,className)					/// генерация REST класса
+	if classType="websocket" d GenWebSocked^sys(namespaces,className)		/// генерация WebSocked класса
+	&html<</div>>
+	
+	
+	&html<</body>>
+	Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

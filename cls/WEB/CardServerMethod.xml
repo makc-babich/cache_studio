@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="WEB.CardServerMethod">
+<Super>WEB.Template.Object</Super>
+<TimeCreated>63124,56116.077282</TimeCreated>
+
+<Property name="classname">
+<Type>%ZEN.Datatype.className</Type>
+<Parameter name="ZENURL" value="CLASSNAME"/>
+</Property>
+
+<XData name="Style">
+<Description>
+Этот блок Style содержит определение CSS стиля страницы.</Description>
+<Data><![CDATA[
+<style type="text/css">
+</style>
+]]></Data>
+</XData>
+
+<XData name="Contents">
+<Description>
+Этот XML блок описывает содержимое этой страницы.</Description>
+<XMLNamespace>http://www.intersystems.com/zen</XMLNamespace>
+<Data><![CDATA[
+<page xmlns="http://www.intersystems.com/zen"  dragAndDrop="true" cellStyle="background: #DCDCDC;">
+<group labelPosition="left">
+<label id="namespacesLabel" label="Область:"/>
+<text id="className" label="Ім'я класу:" size="100" valign="middle" />
+<radioSet id="classType" label="Тип:" displayList="rest,websocket" valueList="rest,websocket" value="rest" />
+</group>
+
+<spacer height="4"/>
+<iframe id="outputFrame" frameBorder="false" height="300" width="100%" containerStyle="background: white;"/>
+
+<spacer height="4"/>
+<hgroup align="right">
+  <button id="btnOk" caption="Так " onclick="zenPage.CompileClass();"/>
+  <button id="btnExit" caption="Вихід" onclick="zenPage.dialogFinish();"/>
+</hgroup>
+</page>
+]]></Data>
+</XData>
+
+<Method name="CompileClass">
+<Description>
+Update label and set source for frame object</Description>
+<ReturnType>%Status</ReturnType>
+<ZenMethod>1</ZenMethod>
+<Implementation><![CDATA[
+	Set namespacesLabel = ..%GetComponentById("namespacesLabel")
+	Set className = ..%GetComponentById("className")
+	Set classType = ..%GetComponentById("classType")
+	Set tOutputFrame = ..%GetComponentById("outputFrame")
+	If $IsObject(tOutputFrame) {
+		Set tQuery("namespaces") = namespacesLabel.value
+		Set tQuery("className") = className.value
+		Set tQuery("classType") = classType.value
+		Set tOutputFrame.src = ..Link("WEB.SYSTEM.CompileClass.cls", .tQuery)
+	}
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="dialogFinish">
+<Description>
+Handle keypress of ESC and ENTER.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[
+	if (zenPage.isPopup){this.firePopupAction('ok');}
+ 	else{self.close();}
+]]></Implementation>
+</Method>
+
+<Method name="onloadHandler">
+<Description>
+This client event, if present, is fired when the page is loaded.</Description>
+<Language>javascript</Language>
+<ClientMethod>1</ClientMethod>
+<Implementation><![CDATA[	zen('namespacesLabel').setValue(opener.zen('namespacesLabel').getValue());
+]]></Implementation>
+</Method>
+</Class>
+</Export>
