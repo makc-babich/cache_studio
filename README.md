@@ -4,7 +4,7 @@ Studio
 ----------
 1. Создать новую область и БД ("STUDIO")
 2. Импортировать классы с директории cls:
-```sh
+```
 zn "STUDIO"
 d $System.OBJ.ImportDir("$GIT_DIR$\cache_studio\cls\", "*.xml", "ckbud", .err, 1)
 ```
@@ -12,8 +12,10 @@ d $System.OBJ.ImportDir("$GIT_DIR$\cache_studio\cls\", "*.xml", "ckbud", .err, 1
 
 Настройка
 ----------
-Директория проектов должна обязательно находится внутри \Ensemble\CSP'\studio чтобы работала функция предпросмотра.
+Директория проектов должна обязательно находится внутри X\Ensemble\CSP'\studio
+чтобы работала функция предпросмотра.
 Меню "Инструменты" -> "Настройки":
 Каталог базы данных: X:\Intersystems\ensemble\mgr\
 Каталог CSP файлов: X:\Intersystems\ensemble\CSP\
 Директория проектов: X:\Intersystems\ensemble\CSP\studio\projects\
+
