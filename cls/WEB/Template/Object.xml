@@ -902,7 +902,9 @@ This callback is called just after the server-side page
 object is created but before its children are created.</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	d ..ImportLanguages()
+	If $l($$GetLanguages^%occMessages("STUDIO"))<8{
+	 d ##class(Template.Object).ImportLanguages()
+	}
 	//Set %session.Language="ua"
 	//set %response.Language="ua"
 	Quit $$$OK
