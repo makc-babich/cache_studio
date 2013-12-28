@@ -12,10 +12,13 @@ Studio
 
 Настройка
 ----------
+Ссылка для запуска приложения: http://localhost:57772/csp/studio/WEB.Main.cls
+
 * Директория проектов должна обязательно находится внутри X\Ensemble\CSP'\studio
 чтобы работала функция предпросмотра.
 * Меню "Инструменты" -> "Настройки":
   * Каталог базы данных: X:\Intersystems\ensemble\mgr\
   * Каталог CSP файлов: X:\Intersystems\ensemble\CSP\
   * Директория проектов: X:\Intersystems\ensemble\CSP\studio\projects\
+  
 

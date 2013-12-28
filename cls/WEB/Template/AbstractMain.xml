@@ -1088,8 +1088,12 @@ Draw html content for files.</Description>
 <Method name="RULang">
 <ZenMethod>1</ZenMethod>
 <Implementation><![CDATA[
-	s %session.Language = "ru"
-	 d %session.Set("language","ru")
+	if ($$GetLanguages^%occMessages("STUDIO")'["ua"){
+		d ##class(WEB.Template.Object).ImportLanguages()
+	}
+	s %session.Language = "ua"
+	s %response.Language = "ua"
+	d %session.Set("language","ru")
 	&js<window.location.reload();>
 ]]></Implementation>
 </Method>
@@ -1097,7 +1101,8 @@ Draw html content for files.</Description>
 <Method name="UALang">
 <ZenMethod>1</ZenMethod>
 <Implementation><![CDATA[
-	s %session.Language = "ua"
+	s %session.Language = "ru"
+	s %response.Language = "ru"
 	d %session.Set("language","ua")
 	&js<window.location.reload();>
 ]]></Implementation>

@@ -883,7 +883,7 @@ comp-id контрола</Description>
 <Method name="ImportLanguages">
 <ClassMethod>1</ClassMethod>
 <Implementation><![CDATA[
-	// Import all the language XML files in the ...\csp\ide\language directory
+	// Import all the language XML files in the ...\csp\studio\language directory
 	Set dir = $$GetFilename^%apiCSP(%request.URL)
 	If $$$isWINDOWS Set dir = $translate(dir,"\","/")
 	If $$$isVMS {
@@ -893,21 +893,6 @@ comp-id контрола</Description>
 	}
 	//&js<alert('#(dir)#')>
 	Do ImportDir^%occMessages(dir,"-d")
-]]></Implementation>
-</Method>
-
-<Method name="%OnCreatePage">
-<Description>
-This callback is called just after the server-side page 
-object is created but before its children are created.</Description>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	If $l($$GetLanguages^%occMessages("STUDIO"))<8{
-	 d ##class(Template.Object).ImportLanguages()
-	}
-	//Set %session.Language="ua"
-	//set %response.Language="ua"
-	Quit $$$OK
 ]]></Implementation>
 </Method>
 

@@ -72,12 +72,12 @@ function setDateTime(id,datetime,format,aParams) {
 		var dayIdx=datetime.getDay()-1;
 		if (dayIdx<0) {dayIdx=6}
 		var lang = zenPage.GetSessionData("language");
-		if (lang=='ua'){
-			var dayName=CalendarUA.Days[dayIdx];
-			var monthName=CalendarUA.Months[monthIdx];
-		}else{
+		if (lang=='ru'){
 			var dayName=CalendarRU.Days[dayIdx];
 			var monthName=CalendarRU.Months[monthIdx];
+		}else{
+			var dayName=CalendarUA.Days[dayIdx];
+			var monthName=CalendarUA.Months[monthIdx];
 		}
 		var date=justify(datetime.getDate(),2,'0');
 		var year=datetime.getFullYear();
