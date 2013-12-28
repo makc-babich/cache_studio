@@ -1,0 +1,386 @@
+Cache for Windows^MAC^routine output by %apiRTN^^~Format=Cache.S~^UTF8
+%RO on 29 Dec 2013 12:24:06AM
+sys^MAC^^63131,50667.478084^0
+sys
+ #define crlf $c(13,10)
+.
+/// установка настроек по умолчанию для проекта
+setProgectConfig(project,RootURL="",applicationRootPath="",outputRootPath="",jsScriptMode="",jsScriptPath="",jsScriptOutputPath="",defaultPage="")
+ if (RootURL="") {s RootURL="/csp/ewd"} 
+ if (applicationRootPath="") {s applicationRootPath="c:\ewdapps"}
+ if (outputRootPath="") {s outputRootPath="c:\InterSystems\Cache\CSP\User"} 
+ if (jsScriptMode="") {s jsScriptMode="fixed"}
+ if (jsScriptPath="") {s jsScriptPath="/"} 
+ if (jsScriptOutputPath="") {s jsScriptOutputPath="c:\InterSystems\Cache\CSP\User"}
+ if (defaultPage="") {s defaultPage="index.csp"}
+ s currNS=$NAMESPACE
+ if 1=##class(%SYS.Namespace).Exists(project) {
+	ZNSPACE project
+	s ^zewd("config","RootURL","csp")=RootURL
+	s ^zewd("config","applicationRootPath")=applicationRootPath
+ 	s ^zewd("config","outputRootPath","csp")=outputRootPath
+ 	s ^zewd("config","jsScriptPath","csp","mode")=jsScriptMode
+ 	s ^zewd("config","jsScriptPath","csp","path")=jsScriptPath
+ 	s ^zewd("config","jsScriptPath","csp","outputPath")=jsScriptOutputPath
+ 	s ^zewd("config","compilePages")=1
+ 	s ^zewd("config","defaultPage")=defaultPage
+     }
+ ZNSPACE currNS
+ q
+ 
+/// получение настроек по умолчанию для проекта 
+getProgectConfig(project)
+ s conf=""
+ s currNS=$NAMESPACE
+ if 1=##class(%SYS.Namespace).Exists(project) {
+	ZNSPACE project
+ 	s RootURL=$g(^zewd("config","RootURL","csp"),"")
+ 	s applicationRootPath=$g(^zewd("config","applicationRootPath"),"")
+ 	s outputRootPath=$g(^zewd("config","outputRootPath","csp"),"")
+ 	s jsScriptMode=$g(^zewd("config","jsScriptPath","csp","mode"),"")
+ 	s jsScriptPath=$g(^zewd("config","jsScriptPath","csp","path"),"")
+ 	s jsScriptOutputPath=$g(^zewd("config","jsScriptPath","csp","outputPath"),"")
+ 	s defaultPage=$g(^zewd("config","defaultPage"),"")
+ 	s conf=RootURL_"^"_applicationRootPath_"^"_outputRootPath_"^"_jsScriptMode_"^"_jsScriptPath_"^"_jsScriptOutputPath_"^"_defaultPage
+ 	}
+ ZNSPACE currNS
+ q conf
+ 
+/// установка настроек для студии
+setIDEConfig(mgrDir,cspDir,projectDir,hostIP,hostPort)
+ if (projectDir="") {s projectDir="c:\"}
+ if (mgrDir="") {s mgrDir="c:\Intersystems\mgr\"}
+ if (cspDir="") {s cspDir="c:\Intersystems\csp\"}
+ if (hostIP="") {s hostIP="localhost"} 
+ if (hostPort="") {s hostPort="57772"} 
+ s ^ide("config","projectDir")=projectDir
+ s ^ide("config","mgrDir")=mgrDir
+ s ^ide("config","cspDir")=cspDir
+ s ^ide("config","hostIP")=hostIP
+ s ^ide("config","hostPort")=hostPort
+ q
+.
+/// получение IP сервера
+getHostIP
+ s hostIP=""
+ s hostIP=$g(^ide("config","hostIP"),"")
+ q hostIP
+.
+/// получение порта сервера
+getHostPort
+ s hostPort=""
+ s hostPort=$g(^ide("config","hostPort"),"")
+ q hostPort
+.
+/// получение настроек студии
+getIDEConfig
+ s conf=""
+ s projectDir=$g(^ide("config","projectDir"),"")
+ s mgrDir=$g(^ide("config","mgrDir"),"")
+ s cspDir=$g(^ide("config","cspDir"),"")
+  s conf=projectDir_"^"_cacheDir_"^"_cspDir
+ q conf
+ 
+ /// создание проекта
+newProject(project)
+ s currNS=$NAMESPACE
+ s mgrDir=$g(^ide("config","mgrDir"),"")
+ ;s mgrDir="D:\InterSystems\Ensemble\mgr\"
+ s cspDir=$g(^ide("config","cspDir"),"")
+ ;s cspDir="D:\InterSystems\Ensemble\CSP\"
+ q:mgrDir=""
+ ZNSPACE "%SYS"
+ s Directory=##class(%Library.File).DirectoryExists(mgrDir_project)
+ q:Directory=1
+ d ##class(%Library.File).CreateNewDir(mgrDir,project)
+ s status=##Class(Config.Configuration).CreateDatabase(project,mgrDir_project,1)
+ s status=##Class(Config.Configuration).GetNamespace(project) 
+ if 'status{
+	d ##Class(Config.Configuration).AddNamespace(project,project,project)
+	s cspStatus= ##Class(Security.Applications).%ExistsId("/csp/"_project)
+	;w cspStatus
+	if 'cspStatus{
+		s Name="/csp/"_project
+		s Property("NameSpace")=project
+		s Property("Path")=cspDir_project
+		d ##CLass(Security.Applications).Create(Name,.Property)
+		/*s csp=##CLass(Security.Applications).%New()
+		s csp.Type=1
+		s csp.Name="/csp/"_project
+		s csp.NameSpace=project
+		s csp.Path=cspDir_project
+		d csp.%Save() */
+	}
+	 ;s ^ide("project",project)=project
+ }
+ ZNSPACE currNS
+ s projectDir=$g(^ide("config","projectDir"),"")
+ d setProgectConfig(project,"/csp/"_project,projectDir,cspDir_project,"","",cspDir_project,"") 
+ 
+ q
+ 
+/// получение имени проекта
+getProject(project)
+ q $g(^ide("project",project),"")
+ 
+/// удаление проекта
+delProject(project)
+ s currNS=$NAMESPACE
+ ZNSPACE "%SYS"
+ ;s mgrDir=$g(^ide("config","mgrDir"),"")
+ s mgrDir="D:\InterSystems\Ensemble\mgr\"
+ s status=  ##Class(Security.Applications).%DeleteId("/csp/"_project)
+ ;w status
+ ;s status=##Class(Config.Namespaces).Delete(project)
+ s status= ##Class(Config.Configuration).RemoveNamespace(project)
+ ;w status
+ ;s status=##Class(Config.Databases).Delete(project)
+ s status= ##Class(Config.Configuration).RemoveDatabase(project)
+ ;w status
+ ;s status= ##class(%Library.File).RemoveDirectoryTree(mgrDir_project)
+ ;w mgrDir_project
+ ;w status
+ ZNSPACE currNS
+ ;k ^ide("project",project)
+.
+CompileProjectAll(project)
+ s currNS=$NAMESPACE
+ ZNSPACE project
+ j compileAll^%zewdAPI(project,"","csp")
+ ZNSPACE currNS
+ q
+ 
+ 
+CreateNewTemplate(Dir,projectID)
+ d ParseDir(Dir,projectID)
+ q
+ 
+ /// просмотр директорий в проекте
+ParseDir(Dir,projectID)
+ ;k ^test
+ s DIROBJ = ##class(%ResultSet).%New("%File:FileSet")
+ s wildcard = "*"
+ s includedirs = 1
+ s drive = ##class(%File).NormalizeDirectory(Dir)
+ s tSC = DIROBJ.%Execute(drive,wildcard,"",includedirs)
+ ;s nd = 0
+ d ParseFiles(Dir,projectID,Dir)
+ While DIROBJ.%Next(){
+	If DIROBJ.Get("Type") = "D" {
+		s d = DIROBJ.GetData(1)
+		d ParseFiles(d,projectID,Dir)
+		;s nd= nd + 1
+		;s ^test("d",nd)=d
+		}
+.
+	}
+ q
+.
+/// выбор файлов из директории
+ParseFiles(Dir,projectID,fullPath)
+ s FILEOBJ = ##class(%ResultSet).%New("%File:FileSet")
+ s wildcard = "*"
+ s includedirs = 1
+ s drive = ##class(%File).NormalizeDirectory(Dir)
+ s tSC = FILEOBJ.%Execute(drive,wildcard,"",includedirs)
+ ;s n = 0
+ While FILEOBJ.%Next() {
+	 
+	If FILEOBJ.Get("Type") '= "D" {
+		s file = FILEOBJ.GetData(1)
+		s type = FILEOBJ.Get("Type")
+		s filename = FILEOBJ.Get("ItemName")
+		s ext=$p(filename,".",$l(filename,"."))
+		s fileData=""
+		d AddFileToTemplate(filename,ext,fileData,file,projectID,fullPath)
+		;s n = n + 1
+		;s ^test(Dir,n,type)=file
+		}
+.
+	}
+ q
+/// Добавление файлов в шаблон проекта
+AddFileToTemplate(fileName,fileType,fileData,filePath,projectID,fullPath)
+ ;s projectDir=$g(^ide("config","projectDir"),"")
+ s from=$l(fullPath)
+ s to=$l(filePath)
+ s shortPath=$e(filePath,from+1,to)
+ s objFile=##class(METADATA.File).%New()
+ d objFile.projectIDSetObjectId(projectID)
+ s objFile.fileName=fileName
+ s objFile.fileType=fileType
+ s objFile.filePath=shortPath
+ 
+ s file=##class(%File).%New(filePath)
+ d file.Open("RS")
+ while 'file.AtEnd {
+	 s rLine = file.ReadLine()_$c(10)
+	 d objFile.fileData.Write(rLine)
+	 }
+ d objFile.%Save()
+ d objFile.%Close()
+ q
+.
+/// Удаление всех файлов из проекта
+DeleteAllFiles(projectID)
+ &sql(delete from METADATA.File where projectID=:projectID )
+ q
+ 
+/// Удаление файла
+DeleteFile(fileID)
+ d ##class(METADATA.File).%DeleteId(fileID)
+ q
+.
+/// Применение шаблона
+ApplayTemplate(templateID,dirName)
+ s projectDir=$g(^ide("config","projectDir"),"")_dirName_"\"
+ s query="select ID from METADATA.File where projectID=?"
+ s rset=##class(%ResultSet).%New("%DynamicQuery:SQL")
+ s sc=rset.Prepare(query)
+ s sc=rset.Execute(templateID)
+ WHILE rset.Next(){
+	 s fileID=rset.Data("ID")
+	 s objFile=##class(METADATA.File).%OpenId(fileID)
+	 s filePath=projectDir_objFile.filePath
+	 s to=$l(filePath,"\")
+	 s d=$p(filePath,"\",1,to-1)
+	 d ##class(%File).CreateDirectory(d)
+	 s file=##class(%File).%New(filePath)
+	 d file.Open("WSN")
+	 while 'objFile.fileData.AtEnd {
+		 s rLine = objFile.fileData.Read()
+		 d file.Write(rLine)
+	 }
+	 d file.Close()
+	 d objFile.%Close()
+ }
+ q
+ 
+ /// Возвращаем содержимое файла
+GetFileData(fileID,data)
+ s objFile=##class(METADATA.File).%OpenId(fileID)
+ while 'objFile.fileData.AtEnd {
+		 s data= data_objFile.fileData.Read()
+	 }
+  d objFile.%Close()
+ q 
+.
+/// записываем данные в файл
+SetFileData(fileID,data)
+ s objFile=##class(METADATA.File).%OpenId(fileID)
+ d objFile.fileData.Write(data)
+ d objFile.%Save()
+ d objFile.%Close()
+ q
+ 
+ /// генерация класса REST
+GenREST(namespaces,className)
+ if '##class(%Dictionary.ClassDefinition).%ExistsId(className){
+	s currNS=$NAMESPACE
+ 	ZNSPACE namespaces
+ 	 
+ 	 s cDef=##class(%Dictionary.ClassDefinition).%New(className)
+	 s cDef.Super="%CSP.REST"
+	 s cDef.Description="Provide a REST interface to the document server service"
+	 ///
+	 s method=##class(%Dictionary.MethodDefinition).%New()
+	 s method.ClassMethod=1
+	 s method.SqlProc=0
+	 s method.Name="Request"
+	 s method.ReturnType="%Status"
+	 s method.parent=cDef
+	 s code=##class(%Stream.TmpCharacter).%New()
+	 d code.Rewind()
+	 d code.Write(" Set %response.ContentType=""text/plain"""_$$$crlf)
+   	 d code.Write(" Do $System.OBJ.Dump(%request)"_$$$crlf)
+	 d code.Write(" Quit $$$OK"_$$$crlf)
+   	 s method.Implementation=code
+	 d method.%Save()
+	 ///
+	 s xdc=##class(%Dictionary.XDataDefinition).%New()
+	 s xdc.parent=cDef
+	 s xdc.Name="UrlMap"
+	 s xdc.Data=##class(%Stream.TmpCharacter).%New()
+	 d xdc.Data.Rewind()
+	 d xdc.Data.Write("<Routes>"_$$$crlf)
+	 d xdc.Data.Write("<Route Url=""/Request"" Method=""GET"" Call=""Request""/>"_$$$crlf)
+	 d xdc.Data.Write("<Route Url=""/Request"" Method=""POST"" Call=""Request""/>"_$$$crlf)
+ 	 d xdc.Data.Write("<Route Url=""/class/:namespace/:classname"" Method=""GET"" Call=""Request""/>"_$$$crlf)
+	 d xdc.Data.Write("</Routes>"_$$$crlf)
+	 ///
+	 s ok=cDef.%Save()
+	 d $System.OBJ.Compile(className,"cuk")
+ 	ZNSPACE currNS
+ 	
+ 	/// изменяем настройку для WEB приложения
+ 	s property("DispatchClass")=className
+ 	d modifyCSPProject(namespaces,.property)
+ }
+ else{
+	 w "Такий класс вже існує!"
+ }
+ q
+ 
+  /// генерация класса WebSocked
+GenWebSocked(namespaces,className)
+ if '##class(%Dictionary.ClassDefinition).%ExistsId(className){
+	s currNS=$NAMESPACE
+ 	ZNSPACE namespaces
+ 	 
+ 	 s cDef=##class(%Dictionary.ClassDefinition).%New(className)
+	 s cDef.Super="%XML.Adaptor, %CSP.WebSocket"
+	 s cDef.Description="Provide a WebSocket interface to the document server service"
+	 ///
+	 s method=##class(%Dictionary.MethodDefinition).%New()
+	 s method.ClassMethod=0
+	 s method.SqlProc=0
+	 s method.Name="Server"
+	 s method.ReturnType="%Status"
+	 s method.parent=cDef
+	 s code=##class(%Stream.TmpCharacter).%New()
+	 d code.Rewind()
+	
+	 d code.Write(" For  {"_$$$crlf)
+	 d code.Write(" 	Set len=32656"_$$$crlf)
+	 d code.Write(" 	Set data=$ZConvert(..Read(.len,.status),""I"",""UTF8"")"_$$$crlf)
+	 d code.Write(" 	If $$$ISOK(status) {"_$$$crlf)
+	 d code.Write(" 		If data=""bye"" {"_$$$crlf)
+	 d code.Write(" 			Do ..EndServer()"_$$$crlf)
+	 d code.Write(" 			Quit"_$$$crlf)
+	 d code.Write(" 		}"_$$$crlf)
+	 d code.Write(" 		Else {"_$$$crlf)
+	 d code.Write(" 			s outData=$ZConvert(""server - ""_data,""O"",""UTF8"")"_$$$crlf)
+	 d code.Write(" 			Do ..Write(outData)"_$$$crlf)
+	 d code.Write(" 		}"_$$$crlf)
+	 d code.Write(" 	}Else{"_$$$crlf)
+	 d code.Write("  		Quit:($$$GETERRORCODE(status)=$$$CSPWebSocketClosed)"_$$$crlf)
+   	 d code.Write(" 	}"_$$$crlf)
+   	 d code.Write(" }"_$$$crlf)
+	 d code.Write(" Quit $$$OK"_$$$crlf)
+   	 s method.Implementation=code
+	 d method.%Save()
+	 s ok=cDef.%Save()
+	 d $System.OBJ.Compile(className,"cuk")
+ 	ZNSPACE currNS
+ }
+ else{
+	 w "Такий класс вже існує!"
+ }
+ q
+ 
+/// изменение свойств в CSP проекте
+modifyCSPProject(project,property)
+ k ^test
+ s ^test("project")=project
+ s ^test("property")=property("DispatchClass")
+ s currNS=$NAMESPACE
+ ZNSPACE "%SYS"
+ s Name="/csp/"_project
+ s cspStatus= ##Class(Security.Applications).Modify(Name,.property)
+ ZNSPACE currNS
+ s ^test("cspStatus")=cspStatus
+ q 
+.
+
+
+
