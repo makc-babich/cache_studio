@@ -1,4 +1,4 @@
-$("document").ready(function(){
+﻿$("document").ready(function(){
     $.ajax({
         method:"GET",
         url:"http://localhost:57773/csp/FAMILYDOCTOR/getListPeople",
