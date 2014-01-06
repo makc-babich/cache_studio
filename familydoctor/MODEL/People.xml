@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MODEL.People">
+<Description>
+Модель данных для класса People</Description>
+<Super>%RegisteredObject,%XML.Adaptor</Super>
+<TimeCreated>63148,43086.009641</TimeCreated>
+
+<Property name="ID">
+<Description>
+id</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="surname">
+<Description>
+фамилия</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="name">
+<Description>
+имя</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="patronymic">
+<Description>
+отчество</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="birthDate">
+<Description>
+дата рождения</Description>
+<Type>%String</Type>
+</Property>
+</Class>
+</Export>

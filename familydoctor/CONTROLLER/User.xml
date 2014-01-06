@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="CONTROLLER.User">
+<Description>
+Класс управления объектом (объектами)  User</Description>
+<Super>%RegisteredObject,%XML.Adaptor</Super>
+<TimeCreated>63148,44081.586998</TimeCreated>
+
+<Method name="getListUser">
+<Description>
+возвращаем список пользователей</Description>
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	///json format
+	s sql="SELECT ID"
+	s sql=sql_",peopleID"
+	s sql=sql_",login"
+	s sql=sql_",password"
+	s sql=sql_",role"
+	s sql=sql_" FROM STORE.User"
+	
+	d ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL("",sql)
+]]></Implementation>
+</Method>
+
+<Method name="updateUser">
+<Description>
+обновление данных пользователя</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>strJSON:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(strJSON,"MODEL.User",.user,1)
+	s clsUser=##class(STORE.User).%OpenId(user.ID)
+	s clsUser.login=user.login
+	s text=$ZCONVERT(user.password,"O","UTF8")
+	s pasw=$SYSTEM.Encryption.Base64Encode(text)
+	s clsUser.password=pasw
+	s clsUser.role=user.role
+	d clsUser.%Save()
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="createUser">
+<Description>
+создание нового пользователя</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>strJSON:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(strJSON,"MODEL.User",.user,1)
+	s clsUser=##class(STORE.User).%New()
+	d clsUser.peopleIDSetObjectId(user.peopleID)
+	s clsUser.login=user.login
+	s text=$ZCONVERT(user.password,"O","UTF8")
+	s pasw=$SYSTEM.Encryption.Base64Encode(text)
+	s clsUser.password=pasw
+	s clsUser.role=user.role
+	d clsUser.%Save()
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="destroyUser">
+<Description>
+удаление существующего пользователя</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>strJSON:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(strJSON,"MODEL.User",.user,1)
+	d ##class(STORE.User).%DeleteId(user.ID)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="authenticate">
+<Description>
+проверка логина и пароля пользователя</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>login:%String,password:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	
+	s id= ..findUser(login)
+	if id=$$$NULLOREF quit $$$NULLOREF
+	s user=##class(STORE.User).%OpenId(id)
+	if 'user.IsPasswordCorrect(password,user.password) quit $$$NULLOREF
+	q id
+]]></Implementation>
+</Method>
+
+<Method name="findUser">
+<Description>
+поиск пользователя</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>login:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	 s id=""
+	 &sql(SELECT ID INTO :id FROM STORE."User" WHERE (login = :login))
+	 q id
+]]></Implementation>
+</Method>
+
+<Method name="isPasswordCorrect">
+<Description>
+проверка пароля</Description>
+<FormalSpec>password:%String,passwordEncode:%String</FormalSpec>
+<ReturnType>%Boolean</ReturnType>
+<Implementation><![CDATA[
+	s text=$ZCONVERT(password,"O","UTF8")
+	s pasw=$SYSTEM.Encryption.Base64Encode(text)
+	if passwordEncode=pasw{ quit 1}	else{quit 0 }
+]]></Implementation>
+</Method>
+</Class>
+</Export>

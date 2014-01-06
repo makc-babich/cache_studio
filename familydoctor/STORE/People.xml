@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="STORE.People">
+<Description>
+Класс физические лица</Description>
+<Super>%Persistent,%Populate,%XML.Adaptor</Super>
+<TimeCreated>63148,42246.385407</TimeCreated>
+
+<Property name="surname">
+<Description>
+фамилия</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="name">
+<Description>
+имя</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="patronymic">
+<Description>
+отчество</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="100"/>
+</Property>
+
+<Property name="birthDate">
+<Description>
+дата рождения</Description>
+<Type>%Date</Type>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^STORE.PeopleD</DataLocation>
+<DefaultData>PeopleDefaultData</DefaultData>
+<IdLocation>^STORE.PeopleD</IdLocation>
+<IndexLocation>^STORE.PeopleI</IndexLocation>
+<StreamLocation>^STORE.PeopleS</StreamLocation>
+<ExtentSize>100</ExtentSize>
+<Data name="PeopleDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>surname</Value>
+</Value>
+<Value name="3">
+<Value>name</Value>
+</Value>
+<Value name="4">
+<Value>patronymic</Value>
+</Value>
+<Value name="5">
+<Value>birthDate</Value>
+</Value>
+</Data>
+<Property name="%%CLASSNAME">
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="birthDate">
+<Selectivity>1.0101%</Selectivity>
+</Property>
+<Property name="name">
+<Selectivity>1.0000%</Selectivity>
+</Property>
+<Property name="patronymic">
+<Selectivity>1.0000%</Selectivity>
+</Property>
+<Property name="surname">
+<Selectivity>1.0000%</Selectivity>
+</Property>
+<SQLMap name="IDKEY">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+</Storage>
+</Class>
+</Export>

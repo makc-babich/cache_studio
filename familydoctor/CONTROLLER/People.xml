@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="CONTROLLER.People">
+<Description>
+Класс управления объектом (объектами)  People</Description>
+<Super>%RegisteredObject,%XML.Adaptor</Super>
+<TimeCreated>63148,43903.008894</TimeCreated>
+
+<Method name="getListPeople">
+<Description>
+возвращаем список физических лиц</Description>
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	///json format
+	s sql="SELECT ID"
+	s sql=sql_",surname"
+	s sql=sql_",name"
+	s sql=sql_",patronymic"
+	s sql=sql_",TO_CHAR(birthDate,'DD.MM.YYYY') AS birthDate"
+	s sql=sql_" FROM STORE.People"
+	
+	d ##class(%ZEN.Auxiliary.jsonSQLProvider).%WriteJSONFromSQL("",sql)
+]]></Implementation>
+</Method>
+
+<Method name="updatePeople">
+<Description>
+изменение физического лица</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>strJSON:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(strJSON,"MODEL.People",.people,1)
+	s clsPeople=##class(STORE.People).%OpenId(people.ID)
+	s clsPeople.surname=people.surname
+	s clsPeople.name=people.name
+	s clsPeople.patronymic=people.patronymic
+	if (people.birthDate'="") {s clsPeople.birthDate=$zdh($replace(people.birthDate,".","/"),4)}
+	d clsPeople.%Save()
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="createPeople">
+<Description>
+создание нового физического лица</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>strJSON:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(strJSON,"MODEL.People",.people,1)
+	s clsPeople=##class(STORE.People).%New()
+	s clsPeople.surname=people.surname
+	s clsPeople.name=people.name
+	s clsPeople.patronymic=people.patronymic
+	if (people.birthDate'="") {s clsPeople.birthDate=$zdh($replace(people.birthDate,".","/"),4)}
+	d clsPeople.%Save()
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="destroyPeople">
+<Description>
+удаление существующего физического лица</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>strJSON:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ##class(%ZEN.Auxiliary.jsonProvider).%ConvertJSONToObject(strJSON,"MODEL.People",.people,1)
+	d ##class(STORE.People).%DeleteId(people.ID)
+	q $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>

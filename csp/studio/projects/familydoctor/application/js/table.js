@@ -14,7 +14,7 @@
             });
         },
         error: function(){
-            alert("ERROR");
+            alert("Ajax error");
         }
     })
 

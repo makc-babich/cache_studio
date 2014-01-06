@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="MODEL.User">
+<Description>
+Модель данных для класса User</Description>
+<Super>%RegisteredObject,%XML.Adaptor</Super>
+<TimeCreated>63148,43171.059203</TimeCreated>
+
+<Property name="peopleID">
+<Description>
+ID физического лица</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="login">
+<Description>
+Логин пользователя</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="password">
+<Description>
+Пароль пользователя</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="role">
+<Description>
+Роль пользователя</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+</Class>
+</Export>

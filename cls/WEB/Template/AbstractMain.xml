@@ -617,7 +617,7 @@ Adjust sizes of menuPane on the page.</Description>
 		k %session.Data
 		s %session.EndSession=1
 	}
-	&js<zenPage.gotoPage('WEB.Maim.cls');>
+	&js<zenPage.gotoPage('WEB.Main.cls');>
 ]]></Implementation>
 </Method>
 

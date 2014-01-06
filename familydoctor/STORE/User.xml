@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="STORE.User">
+<Description>
+Класс пользователей системы</Description>
+<Super>%Persistent,%Populate,%XML.Adaptor</Super>
+<TimeCreated>63148,42801.310131</TimeCreated>
+
+<Property name="peopleID">
+<Description>
+ID физического лица</Description>
+<Type>STORE.People</Type>
+</Property>
+
+<Property name="login">
+<Description>
+Логин пользователя</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="password">
+<Description>
+Пароль пользователя</Description>
+<Type>%String</Type>
+</Property>
+
+<Property name="role">
+<Description>
+Роль пользователя</Description>
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="1000"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^STORE.UserD</DataLocation>
+<DefaultData>UserDefaultData</DefaultData>
+<IdLocation>^STORE.UserD</IdLocation>
+<IndexLocation>^STORE.UserI</IndexLocation>
+<StreamLocation>^STORE.UserS</StreamLocation>
+<ExtentSize>100000</ExtentSize>
+<Data name="UserDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>peopleID</Value>
+</Value>
+<Value name="3">
+<Value>login</Value>
+</Value>
+<Value name="4">
+<Value>password</Value>
+</Value>
+<Value name="5">
+<Value>role</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

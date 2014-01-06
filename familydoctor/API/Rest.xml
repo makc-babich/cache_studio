@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="API.Rest">
+<Description>
+Provide a REST interface to the document server service</Description>
+<ProcedureBlock>0</ProcedureBlock>
+<Super>%CSP.REST</Super>
+<TimeCreated>63148,49074.486827</TimeCreated>
+
+<XData name="UrlMap">
+<Data><![CDATA[
+<Routes>
+<Route Url="/getListPeople" Method="GET" Call="getListPeople"/>
+<Route Url="/class/:strJSON" Method="GET" Call="createPeople"/>
+<Route Url="/class/:login/:password" Method="GET" Call="createPeople"/> 
+</Routes>
+]]></Data>
+</XData>
+
+<Method name="authenticate">
+<Description>
+Проверка логина и пароля пользователя</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>login:%String,password:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="getListPeople">
+<Description>
+Список физических лиц</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ d ##class(CONTROLLER.People).getListPeople()
+ Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="createPeople">
+<Description>
+Создание нового физического лица</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>strJSON:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ d ##class(CONTROLLER.People).createPeople(strJSON)
+ Quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+</Export>
